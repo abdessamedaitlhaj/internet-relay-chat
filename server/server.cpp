@@ -42,9 +42,38 @@ server::server(char **av)
 	std:: cout << "port  :"  << _port << std::endl;
 }
 
-void server::serverSocket() {
+void server::serverSocket() 
+{
+    //add comment later
     serverAddress.sin_family = AF_INET; //ipv4
+    serverAddress.sin_port = htons(_port); // network byte order
+    serverAddress.sin_addr.s_addr = INADDR_ANY; // any local machine
+    _socket = socket(AF_INET, SOCK_STREAM, 0); // server socket fd
+    if(_socket == -1)
+		throw(std::runtime_error("socket creation failed"));
+    int option = 1;
+    int check = 0;
+    check = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &check, sizeof(check));
+    if (check == -1)
+		throw(std::runtime_error("setting option SO_REUSEADDR failed"));
+
+    check = fcntl(_socket, F_SETFL, O_NONBLOCK);
+    if (check == -1)
+        throw(std::runtime_error("setting option(O_NONBLOCK) failed"));
+    check = bind(_socket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)); //bind the socket to the address
+    if (check == -1) 
+        throw(std::runtime_error("binding socket failed"));
+    check = listen(_socket, SOMAXCONN); // listen for  connections && the socket a passive socket
+    if (check == -1) 
+        throw(std::runtime_error("listen() failed"));
+    
+    _poll.fd = _socket;
+    _poll.events = POLLIN; // for reading
+    _poll.revents = 0;
+    _pollfds.push_back(_poll);
 }
+
+
 void server::setup() {
 	//handle signals later 
 	this->serverSocket();

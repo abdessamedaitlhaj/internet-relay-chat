@@ -1,10 +1,12 @@
 #pragma once 
 
-
+//add comment later
 #include <vector>
 #include "client.hpp"
 #include "channel.hpp"
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <poll.h>
 
 
 // Define colors
@@ -24,8 +26,10 @@ class server {
 		int _port;
 		int	_socket;
 		struct sockaddr_in serverAddress;
+		struct pollfd	_poll;
 		std::string _password;
 		std::vector<client> _Clients;
+		std::vector<struct pollfd> _pollfds;
 		std::vector<channel> _Channels;
 	public :
 		void setup();
