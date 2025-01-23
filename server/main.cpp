@@ -15,6 +15,7 @@ int main(int ac, char** av) {
 	try 
     {
         server Server(av);
+        Server.setup();
     }
     catch (const std::exception& e)
     {

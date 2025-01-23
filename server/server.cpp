@@ -41,3 +41,11 @@ server::server(char **av)
 	std:: cout << "pass  :"    << _password << std::endl;
 	std:: cout << "port  :"  << _port << std::endl;
 }
+
+void server::serverSocket() {
+    serverAddress.sin_family = AF_INET; //ipv4
+}
+void server::setup() {
+	//handle signals later 
+	this->serverSocket();
+}
