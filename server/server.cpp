@@ -7,6 +7,8 @@ std::string server::parse_password(std::string password)
 	return(password);
 }
 
+int server::_break = 0;
+
 int server::parse_port(std::string port)
 {
     if (port.empty()) {
@@ -71,10 +73,44 @@ void server::serverSocket()
     _poll.events = POLLIN; // for reading
     _poll.revents = 0;
     _pollfds.push_back(_poll);
+    std::cout << MAGENTA << "SERVER STARTED :   " << _socket << RESET <<"    waiting for connection " <<std::endl;
 }
 
 
+void server::BreakSignal(int signum)
+{
+    if ((signum == SIGINT) || (signum == SIGQUIT))
+    {
+        std::cout << std::endl << "Signal Received !!!" << std::endl;
+        _break = 1;
+    }
+}
+
 void server::setup() {
-	//handle signals later 
+	//handle signals later check sigpipe case later
+    signal(SIGINT, server::BreakSignal);
+	signal(SIGQUIT, server::BreakSignal);
+	signal(SIGPIPE, SIG_IGN);
 	this->serverSocket();
+    while (!_break)
+    {
+        //check if poll failed later 
+        poll(&_pollfds[0], _pollfds.size(), -1);
+        for(size_t i = 0 ; i < _pollfds.size(); i++)
+        {
+            bool hasDataToRead = (_pollfds[i].revents & POLLIN) != 0;
+            if (hasDataToRead) {
+                if (_pollfds[i].fd == _socket)
+                {
+                    // new client
+                    ;
+                }
+                else
+                {
+                    // receive data
+                    ;
+                }
+            }
+        }
+    }
 }

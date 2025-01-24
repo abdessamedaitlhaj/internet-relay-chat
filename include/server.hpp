@@ -25,6 +25,7 @@ class server {
 	private :
 		int _port;
 		int	_socket;
+		static int _break ;
 		struct sockaddr_in serverAddress;
 		struct pollfd	_poll;
 		std::string _password;
@@ -37,4 +38,5 @@ class server {
 		server(char** av);
 		int parse_port(std::string port);
 		std::string parse_password(std::string password);
+		static void BreakSignal(int signum);
 };
