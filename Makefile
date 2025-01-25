@@ -1,8 +1,8 @@
 CPPFLAGS =# -Wall -Wextra -Werror -std=c++98
-NAME = ircserv
-SRC = server/main.cpp	server/client.cpp server/server.cpp
+SRC = main.cpp	src/Client.cpp src/Server.cpp
 OBJ = $(SRC:.cpp=.o)
-HEADER = include/server.hpp include/client.hpp include/server.hpp
+HEADER = include/Server.hpp include/Client.hpp include/Channel.hpp
+NAME = ircserv
 
 all: $(NAME)
 
