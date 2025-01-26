@@ -17,12 +17,20 @@ bool Client::isRegistered() const {
     return _registered;
 }
 
+std::string Client::getPassword() const {
+    return _password;
+}
+
 std::string Client::getNickname() const {
     return _nickname;
 }
 
 std::string Client::getUsername() const {
     return _username;
+}
+
+std::string Client::getRealname() const {
+    return _relaname;
 }
 
 std::string Client::getHostname() const {
@@ -42,15 +50,23 @@ void Client::setRegistered(bool registered) {
     _registered = registered;
 }
 
-void Client::setNickname(const std::string& nickname) {
+void Client::setPassword(const std::string& password) {
+    _password = password;
+}
+
+void Client::setNickName(const std::string& nickname) {
     _nickname = nickname;
 }
 
-void Client::setUsername(const std::string& username) {
+void Client::setUserName(const std::string& username) {
     _username = username;
 }
 
-void Client::setHostname(const std::string& hostname) {
+void Client::setRealName(const std::string& realname) {
+    _relaname = realname;
+}
+
+void Client::setHostName(const std::string& hostname) {
     _hostname = hostname;
 }
 

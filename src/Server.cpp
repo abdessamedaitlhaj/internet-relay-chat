@@ -85,15 +85,8 @@ void Server::breakSignal(int signum)
     }
 }
 
-Client* Server::getClient(int fd) {
-    std::map<int, Client>::iterator it = _clients.find(fd);
-    if (it != _clients.end()) {
-        return &(it->second);
-    }
-    return NULL;
-}
-
 void Server::setup() {
+
     signal(SIGINT, Server::breakSignal);
     signal(SIGQUIT, Server::breakSignal);
     signal(SIGPIPE, SIG_IGN);
@@ -170,28 +163,57 @@ std::vector<std::string> Server::parseData(Client* client) {
     return lines;
 }
 
-void Server::parseCommand(std::string input, int fd) {
+void sendResponse(int fd, const std::string& response) {
+    if (send(fd, response.c_str(), response.length(), 0) == -1) {
+        std::cerr << "Error: Failed to send response to client " << fd << std::endl;
+    }
+}
 
+Client* Server::getClient(int fd) {
+    std::map<int, Client>::iterator it = _clients.find(fd);
+    if (it != _clients.end()) {
+        return &(it->second);
+    }
+    return NULL;
+}
+
+void Server::sendResponse(int fd, const std::string& response) {
+    if (send(fd, response.c_str(), response.length(), 0) == -1) {
+        std::cerr << "Error: Failed to send response to client " << fd << std::endl;
+    }
+}
+
+bool Server::isNicknameInUse(const std::string& nickname) {
+    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        if (it->second.getNickname() == nickname) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Server::parseCommand(std::string input, int fd) {
     Client* client = getClient(fd);
-    if (!client) return;
+    if (!client || input.empty()) return;
 
     std::string prefix, command, params, trailing;
 
-    if (input.empty()) return;
-
+    // Extract prefix (if present)
     size_t pos = 0;
     if (input[0] == ':') {
         pos = input.find(' ');
-        if (pos == std::string::npos) return;
+        if (pos == std::string::npos) return; // Invalid format
         prefix = input.substr(1, pos - 1);
         input = input.substr(pos + 1);
     }
 
+    // Extract command
     pos = input.find(' ');
     command = input.substr(0, pos);
-    std::cout << command << std::endl;
     if (pos != std::string::npos) {
         params = input.substr(pos + 1);
+
+        // Extract trailing (if present)
         pos = params.find(':');
         if (pos != std::string::npos) {
             trailing = params.substr(pos + 1);
@@ -199,56 +221,51 @@ void Server::parseCommand(std::string input, int fd) {
         }
     }
 
+    // Convert command to uppercase for consistency
+    for (size_t i = 0; i < command.length(); ++i) {
+        command[i] = toupper(command[i]);
+    }
+
     if (command == "PASS") {
-        // Handle PASS command
+        if (client->isRegistered()) {
+            sendResponse(fd, "462 :You may not reregister\r\n");
+            return;
+        }
+        if (params != _password) {
+            sendResponse(fd, "464 :Password incorrect\r\n");
+            return;
+        }
+        client->setPassword(params);
     } else if (command == "NICK") {
-        // Handle NICK command
+        if (client->isRegistered()) {
+            sendResponse(fd, "462 :You may not reregister\r\n");
+            return;
+        }
+        if (params.empty()) {
+            sendResponse(fd, "431 :No nickname given\r\n");
+            return;
+        }
+        if (isNicknameInUse(params)) {
+            sendResponse(fd, "433 " + params + " :Nickname is already in use\r\n");
+            return;
+        }
+        client->setNickName(params);
     } else if (command == "USER") {
-        // Handle USER command
-    } else if (command == "JOIN") {
-        // Handle JOIN command
-    } else if (command == "PART") {
-        // Handle PART command
-    } else if (command == "PRIVMSG") {
-        // Handle PRIVMSG command
-    } else if (command == "QUIT") {
-        // Handle QUIT command
-    } else if (command == "PING") {
-        // Handle PING command
-    } else if (command == "PONG") {
-        // Handle PONG command
-    } else {
-        // Handle unknown command
+        if (client->isRegistered()) {
+            sendResponse(fd, "462 :You may not reregister\r\n");
+            return;
+        }
+        if (params.empty()) {
+            sendResponse(fd, "461 USER :Not enough parameters\r\n");
+            return;
+        }
+        client->setUserName(params);
+        client->setRealName(trailing);
+
+        // Check if all registration commands are received
+        if (!client->getPassword().empty() && !client->getNickname().empty() && !client->getUsername().empty()) {
+            client->setRegistered(true);
+            sendResponse(fd, "001 " + client->getNickname() + " :Welcome to the Internet Relay Network " + client->getNickname() + "!" + client->getUsername() + "@hostname\r\n");
+        }
     }
 }
-
-// void server::retrieveData(int fd) {
-
-//     Client *client = getClient(fd);
-//     vector<std::string> tokens;
-//     char buffer[1024];
-//     int bytes = recv(fd, buffer, 1024, 0);
-//     if (bytes <= 0) {
-//         // client disconnected
-//         // for (int i = 0; i < _clients.size(); i++)
-//         //     if (_clients[i].getFd() == fd) {
-//         //         _clients.erase(_clients.begin() + i);
-//         //         break;
-//         //     }
-//         // RM clients
-//         // RM fds
-//         // RM channels
-
-//     } else {
-//         buffer[bytes] = '\0';
-//         client.setBuffer(buffer);
-//         // client->appendToBuffer(data);
-//         tokens(parseData(client));
-//         for (int i = 0; i < tokens.size(); i++) {
-//             // parse and execute command
-//             parseCommand(tokens[i], fd);
-//         }
-//         std::cout << "Received: " << buffer << std::endl;
-//     }
-
-// }
