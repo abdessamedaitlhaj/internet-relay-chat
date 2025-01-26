@@ -53,11 +53,16 @@ class Server {
 		std::string parse_password(std::string password);
 		static void breakSignal(int signum);
 		Client* getClient(int fd);
-		
+
 		std::vector<std::string> parseData(Client* client);
 		void parseCommand(std::string input, int fd);
 		bool isNicknameInUse(const std::string& nickname);
 		void sendResponse(int fd, const std::string& response);
+
+		// AUTH
+		void handlePass(int fd, std::string &params, Client &client);
+		void handleNick(int fd, std::string &params, Client &client);
+		void handleUser(int fd, std::string &params, std::string &trailing, Client &client);
 };
 
 #endif

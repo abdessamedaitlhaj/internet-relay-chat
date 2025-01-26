@@ -1,5 +1,5 @@
 CPPFLAGS =# -Wall -Wextra -Werror -std=c++98
-SRC = main.cpp	src/Client.cpp src/Server.cpp
+SRC = main.cpp	src/Client.cpp src/Server.cpp src/auth.cpp
 OBJ = $(SRC:.cpp=.o)
 HEADER = include/Server.hpp include/Client.hpp include/Channel.hpp
 NAME = ircserv

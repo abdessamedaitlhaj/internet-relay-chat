@@ -183,15 +183,6 @@ void Server::sendResponse(int fd, const std::string& response) {
     }
 }
 
-bool Server::isNicknameInUse(const std::string& nickname) {
-    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        if (it->second.getNickname() == nickname) {
-            return true;
-        }
-    }
-    return false;
-}
-
 void Server::parseCommand(std::string input, int fd) {
     Client* client = getClient(fd);
     if (!client || input.empty()) return;
@@ -226,46 +217,17 @@ void Server::parseCommand(std::string input, int fd) {
         command[i] = toupper(command[i]);
     }
 
-    if (command == "PASS") {
-        if (client->isRegistered()) {
-            sendResponse(fd, "462 :You may not reregister\r\n");
-            return;
-        }
-        if (params != _password) {
-            sendResponse(fd, "464 :Password incorrect\r\n");
-            return;
-        }
-        client->setPassword(params);
-    } else if (command == "NICK") {
-        if (client->isRegistered()) {
-            sendResponse(fd, "462 :You may not reregister\r\n");
-            return;
-        }
-        if (params.empty()) {
-            sendResponse(fd, "431 :No nickname given\r\n");
-            return;
-        }
-        if (isNicknameInUse(params)) {
-            sendResponse(fd, "433 " + params + " :Nickname is already in use\r\n");
-            return;
-        }
-        client->setNickName(params);
-    } else if (command == "USER") {
-        if (client->isRegistered()) {
-            sendResponse(fd, "462 :You may not reregister\r\n");
-            return;
-        }
-        if (params.empty()) {
-            sendResponse(fd, "461 USER :Not enough parameters\r\n");
-            return;
-        }
-        client->setUserName(params);
-        client->setRealName(trailing);
+    if (command == "PASS")
+        handlePass(fd, params, *client);
+    else if (command == "NICK")
+        handleNick(fd, params, *client);
+    else if (command == "USER")
+        handleUser(fd, params, trailing, *client);
 
-        // Check if all registration commands are received
-        if (!client->getPassword().empty() && !client->getNickname().empty() && !client->getUsername().empty()) {
-            client->setRegistered(true);
-            sendResponse(fd, "001 " + client->getNickname() + " :Welcome to the Internet Relay Network " + client->getNickname() + "!" + client->getUsername() + "@hostname\r\n");
-        }
+    // Check if all registration commands are received
+    if (!client->getPassword().empty() && !client->getNickname().empty() && !client->getUsername().empty()) {
+        client->setRegistered(true);
+        sendResponse(fd, "001 " + client->getNickname() + " :Welcome to the Internet Relay Network " + client->getNickname() + "!" + client->getUsername() + "@hostname\r\n");
     }
 }
+
