@@ -1,21 +1,28 @@
 #include "../include/Server.hpp"
 #include "../include/Client.hpp"
+#include "../include/numericReplies.hpp"
 
 
+// pass
+void Server::handlePass(int fd, std::string &params, std::string &command, Client &client) {
 
-void Server::handlePass(int fd, std::string &params, Client &client) {
-
+    if (params.empty()) {
+        sendResponse(fd, ERR_NEEDMOREPARAMS(command));
+        return;
+    }
     if (client.isRegistered()) {
-        sendResponse(fd, "462 :You may not reregister\r\n");
+        sendResponse(fd, ERR_ALREADYREGISTERED(std::string(" ")));
         return;
     }
     if (params != _password) {
-        sendResponse(fd, "464 :Password incorrect\r\n");
+        sendResponse(fd, ERR_PASSMISMATCH(std::string("*")));
         return;
     }
     client.setPassword(params);
+    client.setRegistered(true);
 }
 
+// nickname
 bool Server::isNicknameInUse(const std::string& nickname) {
     for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
         if (it->second.getNickname() == nickname) {
@@ -27,44 +34,42 @@ bool Server::isNicknameInUse(const std::string& nickname) {
 
 bool nickNameValid(std::string &name) {
 
-    if (name.length() < 1 || name.length() > 9) {
-        return false;
-    }
-
     for (size_t i = 1; i < name.length(); ++i)
         if (!std::isalnum(name[i]))
             return false;
     return true;
 }
 
-void Server::handleNick(int fd, std::string &params, Client &client) {
+void Server::handleNick(int fd, std::string &params, std::string &command, Client &client) {
 
     if (!client.isRegistered()) {
-        sendResponse(fd, "462 :You have not reregistered\r\n");
+        sendResponse(fd, ERR_NOTREGISTERED(std::string(params)));
         return;
     }
     if (params.empty()) {
-        sendResponse(fd, "431 :No nickname given\r\n");
+        sendResponse(fd, ERR_NEEDMOREPARAMS(std::string(command)));
+        return;
+    }
+    if (!nickNameValid(params)) {
+        sendResponse(fd, ERR_ERRONEUSNICKNAME(params));
         return;
     }
     if (isNicknameInUse(params)) {
-        sendResponse(fd, "433 " + params + " :Nickname is already in use\r\n");
+        sendResponse(fd, ERR_NICKNAMEINUSE(params));
         return;
     }
-    if (nickNameValid(params))
-        client.setNickName(params);
-    else
-        sendResponse(fd, ": 432 #### :Erroneus nickname");
+    client.setNickName(params);
 }
 
-void Server::handleUser(int fd, std::string &params, std::string &trailing, Client &client) {
+// username
+void Server::handleUser(int fd, std::string &params, std::string &trailing, std::string &command, Client &client) {
 
-    if (client.isRegistered()) {
-        sendResponse(fd, "462 :You may not reregister\r\n");
+    if (!client.isRegistered()) {
+        sendResponse(fd, ERR_NOTREGISTERED(std::string(params)));
         return;
     }
     if (params.empty()) {
-        sendResponse(fd, "461 USER :Not enough parameters\r\n");
+        sendResponse(fd, ERR_NEEDMOREPARAMS(std::string(command)));
         return;
     }
     client.setUserName(params);

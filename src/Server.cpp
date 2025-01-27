@@ -1,4 +1,5 @@
 #include "../include/Server.hpp"
+#include "../include/numericReplies.hpp"
 
 std::string Server::parse_password(std::string password)
 {
@@ -132,13 +133,8 @@ void Server::setup() {
                     } else {
                         buffer[bytes] = '\0';
                         std::cout << "BUFFER : " << buffer << std::endl;
-                        Client& client = _clients[_pollfds[i].fd];
-                        client.setBuffer(std::string(buffer));
-
-                        std::vector<std::string> tokens = parseData(&client);
-                        for (size_t j = 0; j < tokens.size(); j++) {
-                            parseCommand(tokens[j], _pollfds[i].fd);
-                        }
+                        std::string buff(buffer);
+                        handleBuffer(_pollfds[i].fd, buff);
                     }
                 }
             }
@@ -146,14 +142,31 @@ void Server::setup() {
     }
 }
 
+// parse data
+void Server::handleBuffer(int fd, std::string &buffer) {
+
+    Client *client = getClient(fd);
+    std::vector<std::string> commands;
+    client->setBuffer(buffer);
+    if(client->getBuffer().find_first_of("\r\n") == std::string::npos)
+        return;
+    commands = parseData(client);
+    for (int i = 0; i < commands.size(); i++)
+        parseCommand(fd, commands[i]);
+    return;
+}
+
 std::vector<std::string> Server::parseData(Client* client) {
+
     std::vector<std::string> lines;
     std::string buffer = client->getBuffer();
     std::string line;
     std::istringstream stream(buffer);
 
     while (std::getline(stream, line)) {
-        if (line.empty()) continue;
+
+        if (line.empty())
+            continue;
         size_t pos = line.find_first_of("\r\n");
         if (pos != std::string::npos) {
             line.erase(pos);
@@ -183,28 +196,25 @@ void Server::sendResponse(int fd, const std::string& response) {
     }
 }
 
-void Server::parseCommand(std::string input, int fd) {
+void Server::parseCommand(int fd, std::string input) {
+
     Client* client = getClient(fd);
-    if (!client || input.empty()) return;
-
     std::string prefix, command, params, trailing;
-
-    // Extract prefix (if present)
     size_t pos = 0;
+
+    if (!client || input.empty()) return;
     if (input[0] == ':') {
         pos = input.find(' ');
-        if (pos == std::string::npos) return; // Invalid format
+        if (pos == std::string::npos) return;
         prefix = input.substr(1, pos - 1);
         input = input.substr(pos + 1);
     }
 
-    // Extract command
     pos = input.find(' ');
     command = input.substr(0, pos);
     if (pos != std::string::npos) {
         params = input.substr(pos + 1);
 
-        // Extract trailing (if present)
         pos = params.find(':');
         if (pos != std::string::npos) {
             trailing = params.substr(pos + 1);
@@ -212,19 +222,19 @@ void Server::parseCommand(std::string input, int fd) {
         }
     }
 
-    // Convert command to uppercase for consistency
     for (size_t i = 0; i < command.length(); ++i) {
         command[i] = toupper(command[i]);
     }
 
     if (command == "PASS")
-        handlePass(fd, params, *client);
+        handlePass(fd, params, command, *client);
     else if (command == "NICK")
-        handleNick(fd, params, *client);
+        handleNick(fd, params, command, *client);
     else if (command == "USER")
-        handleUser(fd, params, trailing, *client);
+        handleUser(fd, params, trailing, command, *client);
+    else
+        sendResponse(fd, ERR_NOTREGISTERED(std::string("*")));
 
-    // Check if all registration commands are received
     if (!client->getPassword().empty() && !client->getNickname().empty() && !client->getUsername().empty()) {
         client->setRegistered(true);
         sendResponse(fd, "001 " + client->getNickname() + " :Welcome to the Internet Relay Network " + client->getNickname() + "!" + client->getUsername() + "@hostname\r\n");

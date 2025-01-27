@@ -1,9 +1,5 @@
 #pragma once 
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
-
-
 #include "../include/Client.hpp"
 
 #include <iostream>
@@ -55,14 +51,13 @@ class Server {
 		Client* getClient(int fd);
 
 		std::vector<std::string> parseData(Client* client);
-		void parseCommand(std::string input, int fd);
+		void parseCommand(int fd, std::string input);
 		bool isNicknameInUse(const std::string& nickname);
 		void sendResponse(int fd, const std::string& response);
 
+		void handleBuffer(int fd, std::string &buffer);
 		// AUTH
-		void handlePass(int fd, std::string &params, Client &client);
-		void handleNick(int fd, std::string &params, Client &client);
-		void handleUser(int fd, std::string &params, std::string &trailing, Client &client);
+		void handlePass(int fd, std::string &params, std::string &command, Client &client);
+		void handleNick(int fd, std::string &params, std::string &command, Client &client);
+		void handleUser(int fd, std::string &params, std::string &trailing, std::string &command, Client &client);
 };
-
-#endif

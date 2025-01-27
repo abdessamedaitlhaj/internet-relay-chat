@@ -1,5 +1,4 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -37,7 +36,4 @@ public:
     void setHostName(const std::string& hostname);
     void setRealName(const std::string& realname);
     void setBuffer(const std::string& buffer);
-    void appendToBuffer(const std::string& str);
 };
-
-#endif

@@ -71,9 +71,5 @@ void Client::setHostName(const std::string& hostname) {
 }
 
 void Client::setBuffer(const std::string& buffer) {
-    _buffer = buffer;
-}
-
-void Client::appendToBuffer(const std::string& str) {
-    _buffer += str;
+    _buffer += buffer;
 }
