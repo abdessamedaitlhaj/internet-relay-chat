@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../include/Channel.hpp"
+#include "../include/Client.hpp"
 #include <string>
 #include <vector>
 #include <set>
@@ -12,6 +13,7 @@ class Channel;
 class Channel {
 
     private:
+        static Channel *_channelManager;
         bool _inviteOnly;
         bool _topicRestriction;
         bool _userLimit;
@@ -21,7 +23,8 @@ class Channel {
         std::vector<Client> _members;
         std::vector<Client> _operators;
         std::vector<Channel> _channels;
-        void sendToClient(Client *client, const std::string &message) const;
+        
+        //void sendToClient(Client *client, const std::string &message) const;
 
     public:
         Channel(const std::string &name);
@@ -32,6 +35,7 @@ class Channel {
 
         void setTopic(const std::string &topic);
 
+        Channel *getChannel(std::string &name);
         void addMember(Client *client);
         void removeMember(Client *client);
         void addOperator(Client *client);

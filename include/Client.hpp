@@ -36,4 +36,5 @@ public:
     void setHostName(const std::string& hostname);
     void setRealName(const std::string& realname);
     void setBuffer(const std::string& buffer);
+    void clearBuffer();
 };

@@ -143,6 +143,7 @@ void Server::setup() {
 }
 
 // parse data
+
 void Server::handleBuffer(int fd, std::string &buffer) {
 
     Client *client = getClient(fd);
@@ -153,6 +154,7 @@ void Server::handleBuffer(int fd, std::string &buffer) {
     commands = parseData(client);
     for (int i = 0; i < commands.size(); i++)
         parseCommand(fd, commands[i]);
+    client->clearBuffer();
     return;
 }
 
@@ -196,42 +198,59 @@ void Server::sendResponse(int fd, const std::string& response) {
     }
 }
 
+std::vector<std::string> Server::split(const std::string& str, const std::string& delimiters) {
+
+    std::vector<std::string> tokens;
+    size_t start = str.find_first_not_of(delimiters);
+    size_t end = 0;
+
+    while ((end = str.find_first_of(delimiters, start)) != std::string::npos) {
+        if (end > start) {
+            tokens.push_back(str.substr(start, end - start));
+        }
+        start = str.find_first_not_of(delimiters, end);
+    }
+
+    if (start != std::string::npos) {
+        tokens.push_back(str.substr(start));
+    }
+
+    return tokens;
+}
+
 void Server::parseCommand(int fd, std::string input) {
 
     Client* client = getClient(fd);
-    std::string prefix, command, params, trailing;
+    std::string command, params, trailing;
+    std::vector<std::string> tokens;
     size_t pos = 0;
 
-    if (!client || input.empty()) return;
-    if (input[0] == ':') {
-        pos = input.find(' ');
-        if (pos == std::string::npos) return;
-        prefix = input.substr(1, pos - 1);
-        input = input.substr(pos + 1);
-    }
-
-    pos = input.find(' ');
-    command = input.substr(0, pos);
+    if (!client || input.empty())
+        return;
+    pos = input.find(":");
     if (pos != std::string::npos) {
-        params = input.substr(pos + 1);
-
-        pos = params.find(':');
-        if (pos != std::string::npos) {
-            trailing = params.substr(pos + 1);
-            params = params.substr(0, pos);
-        }
+        tokens = Server::split(input.substr(0, pos), std::string("\t "));
+        command = tokens[0];
+        trailing = input.substr(pos);
+    } else {
+        tokens = Server::split(input, std::string("\t "));
+        command = tokens[0];
     }
+
+    std::cout << "commad : " << command << std::endl;
 
     for (size_t i = 0; i < command.length(); ++i) {
         command[i] = toupper(command[i]);
     }
 
     if (command == "PASS")
-        handlePass(fd, params, command, *client);
+        handlePass(fd, tokens, *client);
     else if (command == "NICK")
-        handleNick(fd, params, command, *client);
+        handleNick(fd, tokens, *client);
     else if (command == "USER")
-        handleUser(fd, params, trailing, command, *client);
+        handleUser(fd, tokens, trailing, *client);
+    else if (command == "TOPIC")
+        handleTopic(fd, tokens, trailing, *client);
     else
         sendResponse(fd, ERR_NOTREGISTERED(std::string("*")));
 
@@ -239,5 +258,13 @@ void Server::parseCommand(int fd, std::string input) {
         client->setRegistered(true);
         sendResponse(fd, "001 " + client->getNickname() + " :Welcome to the Internet Relay Network " + client->getNickname() + "!" + client->getUsername() + "@hostname\r\n");
     }
+}
+
+Channel *Server::getChannel(std::string &name) {
+
+    for (int i = 0; i < _channels.size(); i++)
+        if (_channels[i].getName() == name)
+            return (&_channels[i]);
+    return (NULL);
 }
 

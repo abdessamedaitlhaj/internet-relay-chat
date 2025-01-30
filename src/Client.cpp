@@ -73,3 +73,8 @@ void Client::setHostName(const std::string& hostname) {
 void Client::setBuffer(const std::string& buffer) {
     _buffer += buffer;
 }
+
+void Client::clearBuffer() {
+
+    _buffer.clear();
+}

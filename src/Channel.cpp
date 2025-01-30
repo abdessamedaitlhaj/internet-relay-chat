@@ -1,4 +1,5 @@
 #include "../include/Channel.hpp"
+                        
 
 Channel::Channel(const std::string &name) : _name(name) {
     _inviteOnly = false;
@@ -19,6 +20,14 @@ std::string Channel::getTopic() const {
 
 void Channel::setTopic(const std::string &topic) {
     _topic = topic;
+}
+
+Channel *Channel::getChannel(std::string &name) {
+
+    for (int i = 0; i < _channels.size(); i++)
+        if (_channels[i]._name == name)
+            return &_channels[i];
+    return (NULL);
 }
 
 void Channel::addMember(Client *client) {
