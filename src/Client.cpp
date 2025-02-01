@@ -78,3 +78,7 @@ void Client::clearBuffer() {
 
     _buffer.clear();
 }
+
+void Client::addChannel(Channel* channel) {
+    _channels.push_back(channel);
+}

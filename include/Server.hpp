@@ -1,7 +1,7 @@
 #pragma once 
 
-#include "../include/Client.hpp"
-#include "../include/Channel.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
 
 #include <iostream>
 #include <string>
@@ -41,28 +41,30 @@ class Server {
 		std::string _password;
 		std::map<int, Client> _clients;
 		std::vector<struct pollfd> _pollfds;
-		std::vector<Channel> _channels;
+		std::vector<Channel*> _channels;
 
 	public:
-		void setup();
-		void serverSocket();
 		Server(char** av);
-		int parse_port(std::string port);
-		std::string parse_password(std::string password);
-		static void breakSignal(int signum);
-		Client* getClient(int fd);
+		void						setup();
+		void						serverSocket();
+		int							parse_port(std::string port);
+		std::string 				parse_password(std::string password);
+		static void 				breakSignal(int signum);
+		Client*						getClient(int fd);
 
-		Channel *getChannel(std::string &name);
-		std::vector<std::string> parseData(Client* client);
-		void parseCommand(int fd, std::string input);
-		bool isNicknameInUse(const std::string& nickname);
-		void sendResponse(int fd, const std::string& response);
-		void handleBuffer(int fd, std::string &buffer);
-		std::vector<std::string> split(const std::string& str, const std::string& delimiters);
+		Channel 					*getChannel(std::string &name);
+		std::vector<std::string> 	parseData(Client* client);
+		void 						parseCommand(int fd, std::string input);
+		bool 						isNicknameInUse(const std::string& nickname);
+		void 						sendResponse(int fd, const std::string& response);
+		void 						handleBuffer(int fd, std::string &buffer);
+		std::vector<std::string> 	split(const std::string& str, const std::string& delimiters);
+		
 		// AUTH
-		void handlePass(int fd, std::vector<std::string> &tokens, Client &client);
-		void handleNick(int fd, std::vector<std::string> &tokens, Client &client);
-		void handleUser(int fd, std::vector<std::string> &tokens, std::string &trailing, Client &client);
-		void handleTopic(int fd, std::string &params, std::string &trailing, std::string &command, Client &client);
-
+		void						handlePass(int fd, std::vector<std::string> &tokens, Client &client);
+		void						handleNick(int fd, std::vector<std::string> &tokens, Client &client);
+		void						handleUser(int fd, std::vector<std::string> &tokens, std::string &trailing, Client &client);
+		void						handleTopic(int fd, std::vector<std::string> tokens, std::string &trailing, Client &client);
+		bool						channelNameValid(std::string &channelName);
+		void 						addChannel(Channel *channel);
 };

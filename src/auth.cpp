@@ -59,6 +59,11 @@ void Server::handleNick(int fd, std::vector<std::string> &tokens, Client &client
         return;
     }
     client.setNickName(tokens[1]);
+    
+    if (!client.getPassword().empty() && !client.getNickname().empty() && !client.getUsername().empty()) {
+        client.setRegistered(true);
+        sendResponse(fd, RPL_WELCOME(client.getNickname(), client.getUsername()));
+    }
 }
 
 // username
@@ -74,4 +79,8 @@ void Server::handleUser(int fd,std::vector<std::string> &tokens, std::string &tr
     }
     client.setUserName(tokens[1]);
     client.setRealName(trailing);
+    if (!client.getPassword().empty() && !client.getNickname().empty() && !client.getUsername().empty()) {
+        client.setRegistered(true);
+        sendResponse(fd, "001 " + client.getNickname() + " :Welcome to the Internet Relay Network " + client.getNickname() + "!" + client.getUsername() + "@localhost\r\n");
+    }
 }

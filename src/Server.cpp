@@ -53,7 +53,7 @@ void Server::serverSocket()
     _socket = socket(AF_INET, SOCK_STREAM, 0); // server socket fd
     if(_socket == -1)
 		throw(std::runtime_error("socket creation failed"));
-    int option = 1;
+    //int option = 1;
     int check = 0;
     check = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &check, sizeof(check));
     if (check == -1)
@@ -152,7 +152,7 @@ void Server::handleBuffer(int fd, std::string &buffer) {
     if(client->getBuffer().find_first_of("\r\n") == std::string::npos)
         return;
     commands = parseData(client);
-    for (int i = 0; i < commands.size(); i++)
+    for (size_t i = 0; i < commands.size(); i++)
         parseCommand(fd, commands[i]);
     client->clearBuffer();
     return;
@@ -251,20 +251,22 @@ void Server::parseCommand(int fd, std::string input) {
         handleUser(fd, tokens, trailing, *client);
     else if (command == "TOPIC")
         handleTopic(fd, tokens, trailing, *client);
-    else
+    else if (!client->isRegistered())
         sendResponse(fd, ERR_NOTREGISTERED(std::string("*")));
+    else
+        sendResponse(fd, ERR_UNKNOWNCOMMAND(std::string("*")));
 
-    if (!client->getPassword().empty() && !client->getNickname().empty() && !client->getUsername().empty()) {
-        client->setRegistered(true);
-        sendResponse(fd, "001 " + client->getNickname() + " :Welcome to the Internet Relay Network " + client->getNickname() + "!" + client->getUsername() + "@hostname\r\n");
-    }
 }
 
 Channel *Server::getChannel(std::string &name) {
 
-    for (int i = 0; i < _channels.size(); i++)
-        if (_channels[i].getName() == name)
-            return (&_channels[i]);
+    for (size_t i = 0; i < _channels.size(); i++)
+        if (_channels[i]->getName() == name)
+            return (_channels[i]);
     return (NULL);
+}
+
+void Server::addChannel(Channel *channel) {
+    _channels.push_back(channel);
 }
 

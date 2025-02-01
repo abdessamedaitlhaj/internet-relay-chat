@@ -22,14 +22,6 @@ void Channel::setTopic(const std::string &topic) {
     _topic = topic;
 }
 
-Channel *Channel::getChannel(std::string &name) {
-
-    for (int i = 0; i < _channels.size(); i++)
-        if (_channels[i]._name == name)
-            return &_channels[i];
-    return (NULL);
-}
-
 void Channel::addMember(Client *client) {
     _members.push_back(*client);
 }
@@ -58,7 +50,7 @@ void Channel::removeOperator(Client *client) {
 
 bool Channel::isMember(Client *client) const {
     for (size_t i = 0; i < _members.size(); ++i) {
-        if (&_members[i] == client) {
+        if (_members[i].getNickname() == client->getNickname()) {
             return true;
         }
     }
@@ -84,7 +76,7 @@ bool Channel::hasMode(char mode) const {
 
 // send messages
 
-//void Channel::broadcast(const std::string &message, Client *sender) const {
+// void Channel::broadcast(const std::string &message, Client *sender) const {
 //     for (size_t i = 0; i < _members.size(); ++i) {
 //         if (&_members[i] != sender) {
 //             sendToClient(&_members[i], message);
@@ -95,3 +87,4 @@ bool Channel::hasMode(char mode) const {
 // void Channel::sendToClient(Client *client, const std::string &message) const {
 //     // Send message to client
 // }
+
