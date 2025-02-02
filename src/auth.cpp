@@ -1,11 +1,9 @@
 #include "../include/Server.hpp"
-#include "../include/Client.hpp"
-#include "../include/numericReplies.hpp"
-
 
 // pass
-void Server::handlePass(int fd, std::vector<std::string> &tokens, Client &client) {
+void Server::pass(std::vector<std::string> &tokens, Client &client) {
 
+    int fd = client.getFd();
     if (tokens.size() == 1) {
         sendResponse(fd, ERR_NEEDMOREPARAMS(tokens[0]));
         return;
@@ -19,7 +17,6 @@ void Server::handlePass(int fd, std::vector<std::string> &tokens, Client &client
         return;
     }
     client.setPassword(tokens[1]);
-    client.setRegistered(true);
 }
 
 // nickname
@@ -40,9 +37,10 @@ bool nickNameValid(std::string &name) {
     return true;
 }
 
-void Server::handleNick(int fd, std::vector<std::string> &tokens, Client &client) {
+void Server::nick(std::vector<std::string> &tokens, Client &client) {
 
-    if (!client.isRegistered()) {
+    int fd = client.getFd();
+    if (client.getPassword().empty()) {
         sendResponse(fd, ERR_NOTREGISTERED(std::string(std::string("*"))));
         return;
     }
@@ -62,14 +60,15 @@ void Server::handleNick(int fd, std::vector<std::string> &tokens, Client &client
     
     if (!client.getPassword().empty() && !client.getNickname().empty() && !client.getUsername().empty()) {
         client.setRegistered(true);
-        sendResponse(fd, RPL_WELCOME(client.getNickname(), client.getUsername()));
+        sendResponse(fd, RPL_WELCOME(client.getNickname(), client.getUsername(), client.getHostname()));
     }
 }
 
 // username
-void Server::handleUser(int fd,std::vector<std::string> &tokens, std::string &trailing, Client &client) {
+void Server::user(std::vector<std::string> &tokens, std::string &trailing, Client &client) {
 
-    if (!client.isRegistered()) {
+    int fd = client.getFd();
+    if (client.getPassword().empty()) {
         sendResponse(fd, ERR_NOTREGISTERED(std::string(std::string("*"))));
         return;
     }
@@ -81,6 +80,6 @@ void Server::handleUser(int fd,std::vector<std::string> &tokens, std::string &tr
     client.setRealName(trailing);
     if (!client.getPassword().empty() && !client.getNickname().empty() && !client.getUsername().empty()) {
         client.setRegistered(true);
-        sendResponse(fd, "001 " + client.getNickname() + " :Welcome to the Internet Relay Network " + client.getNickname() + "!" + client.getUsername() + "@localhost\r\n");
+        sendResponse(fd, RPL_WELCOME(client.getNickname(), client.getUsername(), client.getHostname()));
     }
 }

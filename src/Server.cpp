@@ -1,5 +1,4 @@
 #include "../include/Server.hpp"
-#include "../include/numericReplies.hpp"
 
 std::string Server::parse_password(std::string password)
 {
@@ -235,26 +234,31 @@ void Server::parseCommand(int fd, std::string input) {
     } else {
         tokens = Server::split(input, std::string("\t "));
         command = tokens[0];
+        if (tokens.size() > 2)
+            trailing = tokens[2];
     }
-
-    std::cout << "commad : " << command << std::endl;
 
     for (size_t i = 0; i < command.length(); ++i) {
         command[i] = toupper(command[i]);
     }
 
+
     if (command == "PASS")
-        handlePass(fd, tokens, *client);
+        pass(tokens, *client);
     else if (command == "NICK")
-        handleNick(fd, tokens, *client);
+        nick(tokens, *client);
     else if (command == "USER")
-        handleUser(fd, tokens, trailing, *client);
-    else if (command == "TOPIC")
-        handleTopic(fd, tokens, trailing, *client);
-    else if (!client->isRegistered())
+        user(tokens, trailing, *client);
+    else if (client->isRegistered()) {
+
+        if (command == "TOPIC")
+            topic(tokens, trailing, *client);
+        else if (command == "PRIVMSG")
+            privmsg(tokens, trailing, *client);
+        else
+            sendResponse(fd, ERR_UNKNOWNCOMMAND(std::string("*")));
+    } else
         sendResponse(fd, ERR_NOTREGISTERED(std::string("*")));
-    else
-        sendResponse(fd, ERR_UNKNOWNCOMMAND(std::string("*")));
 
 }
 
@@ -270,3 +274,11 @@ void Server::addChannel(Channel *channel) {
     _channels.push_back(channel);
 }
 
+Client *Server::getClientNick(std::string &nick) {
+
+    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        if (it->second.getNickname() == nick)
+            return &(it->second);
+    }
+    return (NULL);
+}
