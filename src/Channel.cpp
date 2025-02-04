@@ -86,15 +86,15 @@ bool Channel::hasMode(char mode) const {
     return _modes.find(mode) != _modes.end();
 }
 
-// send messages
-
-// void Channel::broadcast(const std::string &message, Client *sender) const {
-//     for (size_t i = 0; i < _members.size(); ++i) {
-//         if (&_members[i] != sender) {
-//             sendToClient(&_members[i], message);
-//         }
-//     }
-// }
+void Channel::broadcast(const std::string &message, Client *sender) const {
+    for (size_t i = 0; i < _members.size(); ++i) {
+        if (&_members[i] != sender) {
+            if (send(_members[i].getFd(), message.c_str(), message.length(), 0) == -1) {
+                std::cerr << "Error: Failed to send message to client " << _members[i].getFd() << std::endl;
+            }
+        }
+    }
+}
 
 // void Channel::sendToClient(Client *client, const std::string &message) const {
 //     // Send message to client

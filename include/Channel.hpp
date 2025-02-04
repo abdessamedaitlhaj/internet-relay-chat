@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <sys/socket.h>
 
 class Client;
 

@@ -2,6 +2,7 @@
 
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "numericReplies.hpp"
 
 #include <iostream>
 #include <string>
@@ -69,4 +70,12 @@ class Server {
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
 		
+		// handle commands
+		void						pass(std::vector<std::string> &tokens, Client &client);
+		void						nick(std::vector<std::string> &tokens, Client &client);
+		void						user(std::vector<std::string> &tokens, std::string &trailing, Client &client);
+		void						topic(std::vector<std::string> tokens, std::string &trailing, Client &client);
+		void    					privmsg(std::vector<std::string> &tokens, std::string &trailing, Client &client);
+
+		Client						*getClientNick(std::string &nick);
 };
