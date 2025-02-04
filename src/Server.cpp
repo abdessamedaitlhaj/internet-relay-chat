@@ -251,6 +251,8 @@ void Server::parseCommand(int fd, std::string input) {
         handleUser(fd, tokens, trailing, *client);
     else if (command == "TOPIC")
         handleTopic(fd, tokens, trailing, *client);
+    else if (command == "JOIN")
+        handlejoin(fd, tokens, trailing, *client);
     else if (!client->isRegistered())
         sendResponse(fd, ERR_NOTREGISTERED(std::string("*")));
     else

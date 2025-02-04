@@ -65,6 +65,8 @@ class Server {
 		void						handleNick(int fd, std::vector<std::string> &tokens, Client &client);
 		void						handleUser(int fd, std::vector<std::string> &tokens, std::string &trailing, Client &client);
 		void						handleTopic(int fd, std::vector<std::string> tokens, std::string &trailing, Client &client);
+		void						handlejoin(int fd, std::vector<std::string>& tokens, std::string& trailing, Client& client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
+		
 };

@@ -14,3 +14,4 @@
 #define ERR_NOTONCHANNEL(channelName) "442 " + channelName + " :You're not on that channel" + CRLF
 #define RPL_NOTOPIC(channelName) "331 " + channelName + " :No topic is set" + CRLF
 #define RPL_TOPIC(channelName, topic) "332 " + channelName + " :" + topic + CRLF
+#define ERR_INVITEONLYCHAN(channelName) "473 " + channelName + " :Cannot join channel (+i)" + CRLF

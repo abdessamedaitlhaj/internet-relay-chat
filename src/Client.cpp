@@ -17,6 +17,16 @@ bool Client::isRegistered() const {
     return _registered;
 }
 
+bool Client::getinvitechannel(const std::string& name) const
+{
+    for (size_t i = 0; i < _channels.size(); i++)
+    {
+        if (_channels[i]->getName() == name)
+            return true;
+    }
+    return false;
+}
+
 std::string Client::getPassword() const {
     return _password;
 }
@@ -77,6 +87,17 @@ void Client::setBuffer(const std::string& buffer) {
 void Client::clearBuffer() {
 
     _buffer.clear();
+}
+
+void Client::removeChannelInvite(std::string &name) {
+    for (size_t i = 0; i < _channels.size(); i++)
+    {
+        if (_channels[i]->getName() == name)
+        {
+            _channels.erase(_channels.begin() + i);
+            return ;
+        }
+    }
 }
 
 void Client::addChannel(Channel* channel) {

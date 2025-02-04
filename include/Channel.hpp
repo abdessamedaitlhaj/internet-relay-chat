@@ -28,6 +28,7 @@ class Channel {
 
         std::string getName() const;
         std::string getTopic() const;
+        bool getInviteOnly() const;
 
         void setTopic(const std::string &topic);
 
@@ -37,6 +38,7 @@ class Channel {
         void removeOperator(Client *client);
         bool isMember(Client *client) const;
         bool isOperator(Client *client) const;
+        bool isInvited(Client *client, std::string name, int flg) const;
 
         void setMode(char mode, bool enable);
         bool hasMode(char mode) const;

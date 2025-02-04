@@ -17,6 +17,9 @@ std::string Channel::getName() const {
 std::string Channel::getTopic() const {
     return _topic;
 }
+bool Channel::getInviteOnly() const {
+    return _inviteOnly;
+}
 
 void Channel::setTopic(const std::string &topic) {
     _topic = topic;
@@ -62,6 +65,15 @@ bool Channel::isOperator(Client *client) const {
         if (&_operators[i] == client) {
             return true;
         }
+    }
+    return false;
+}
+bool Channel::isInvited(Client *client, std::string name, int flg) const {
+    if (client->getinvitechannel(name)){
+        if (flg == 1){
+            client->removeChannelInvite(name);
+        }
+        return true;
     }
     return false;
 }

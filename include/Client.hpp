@@ -27,6 +27,7 @@ class Client {
 
         int getFd() const;
         bool isRegistered() const;
+        bool getinvitechannel(const std::string& name) const;
         std::string getPassword() const;
         std::string getNickname() const;
         std::string getUsername() const;
@@ -44,4 +45,5 @@ class Client {
         void setBuffer(const std::string& buffer);
         void clearBuffer();
         void addChannel(Channel* channel);
+        void removeChannelInvite(std::string& name);
 };
