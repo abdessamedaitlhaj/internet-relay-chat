@@ -85,6 +85,44 @@ void Server::breakSignal(int signum)
     }
 }
 
+
+void Server::accept_cl()
+{
+    struct sockaddr_in clientAddr;
+    socklen_t clientLen = sizeof(clientAddr);
+    int clientFd = accept(_socket, (struct sockaddr*)&clientAddr, &clientLen);
+    // or continue check later
+    if (clientFd < 0) return ;
+
+    fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    struct pollfd newPoll;
+    newPoll.fd = clientFd;
+    newPoll.events = POLLIN;
+    newPoll.revents = 0;
+    _pollfds.push_back(newPoll);
+    _clients[clientFd] = Client(clientFd);
+}
+
+
+void Server::receive(size_t & i)
+{
+    char buffer[1024];
+    int bytes = recv(_pollfds[i].fd, buffer, sizeof(buffer) - 1, 0);
+
+    if (bytes <= 0) {
+        // Client disconnected
+        close(_pollfds[i].fd);
+        _clients.erase(_pollfds[i].fd);
+        _pollfds.erase(_pollfds.begin() + i);
+        i--;
+    } else {
+        buffer[bytes] = '\0';
+        std::cout << "BUFFER : " << buffer << std::endl;
+        std::string buff(buffer);
+        handleBuffer(_pollfds[i].fd, buff);
+    }
+}
+
 void Server::setup() {
 
     signal(SIGINT, Server::breakSignal);
@@ -105,36 +143,10 @@ void Server::setup() {
             if (_pollfds[i].revents & POLLIN) {
                 if (_pollfds[i].fd == _socket) {
                     // Accept new client
-                    struct sockaddr_in clientAddr;
-                    socklen_t clientLen = sizeof(clientAddr);
-                    int clientFd = accept(_socket, (struct sockaddr*)&clientAddr, &clientLen);
-
-                    if (clientFd < 0) continue;
-
-                    fcntl(clientFd, F_SETFL, O_NONBLOCK);
-                    struct pollfd newPoll;
-                    newPoll.fd = clientFd;
-                    newPoll.events = POLLIN;
-                    newPoll.revents = 0;
-                    _pollfds.push_back(newPoll);
-                    _clients[clientFd] = Client(clientFd);
+                    accept_cl();
                 } else {
                     // Receive data from existing client
-                    char buffer[1024];
-                    int bytes = recv(_pollfds[i].fd, buffer, sizeof(buffer) - 1, 0);
-
-                    if (bytes <= 0) {
-                        // Client disconnected
-                        close(_pollfds[i].fd);
-                        _clients.erase(_pollfds[i].fd);
-                        _pollfds.erase(_pollfds.begin() + i);
-                        i--;
-                    } else {
-                        buffer[bytes] = '\0';
-                        std::cout << "BUFFER : " << buffer << std::endl;
-                        std::string buff(buffer);
-                        handleBuffer(_pollfds[i].fd, buff);
-                    }
+                    receive(i);
                 }
             }
         }

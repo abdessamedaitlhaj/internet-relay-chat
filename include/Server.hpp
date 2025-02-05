@@ -46,6 +46,8 @@ class Server {
 
 	public:
 		Server(char** av);
+		void accept_cl();
+		void receive(size_t & i);
 		void						setup();
 		void						serverSocket();
 		int							parse_port(std::string port);
