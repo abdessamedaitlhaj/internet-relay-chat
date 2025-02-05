@@ -13,11 +13,12 @@ class Client {
         int _fd;
         bool _registered;
         std::string _password;
-        std::string _nickname;
-        std::string _username;
-        std::string _hostname;
-        std::string _relaname;
+        std::string _nickName;
+        std::string _userName;
+        std::string _hostName;
+        std::string _realName;
         std::string _buffer;
+        std::string _ipAddress;
         std::vector<Channel*> _channels;
 
     public:
@@ -27,12 +28,13 @@ class Client {
 
         int getFd() const;
         bool isRegistered() const;
-        bool getinvitechannel(const std::string& name) const;
+        bool getInviteChannel(const std::string& name) const;
         std::string getPassword() const;
-        std::string getNickname() const;
-        std::string getUsername() const;
-        std::string getHostname() const;
-        std::string getRealname() const;
+        std::string getNickName() const;
+        std::string getUserName() const;
+        std::string getHostName() const;
+        std::string getRealName() const;
+        std::string getIpAddress() const;
         std::string getBuffer() const;
 
         void setFd(int fd);
@@ -40,8 +42,8 @@ class Client {
         void setPassword(const std::string& password);
         void setNickName(const std::string& nickname);
         void setUserName(const std::string& username);
-        void setHostName(const std::string& hostname);
         void setRealName(const std::string& realname);
+        void setIpAddress(const std::string& ipAddress);
         void setBuffer(const std::string& buffer);
         void clearBuffer();
         void addChannel(Channel* channel);

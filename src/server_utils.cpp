@@ -81,22 +81,22 @@ void Server::parseCommand(int fd, std::string input) {
 
 
     if (command == "PASS")
-        pass(tokens, *client);
+        handlePass(fd, tokens, *client);
     else if (command == "NICK")
-        nick(tokens, *client);
+        handleNick(fd, tokens, *client);
     else if (command == "USER")
-        user(tokens, trailing, *client);
+        handleUser(fd, tokens, trailing, *client);
     else if (client->isRegistered()) {
         if (command == "TOPIC")
-            topic(tokens, trailing, *client);
+            handleTopic(fd, tokens, trailing, *client);
         else if (command == "PRIVMSG")
-            privmsg(tokens, trailing, *client);
+            handlePrivmsg(fd, tokens, trailing, *client);
         else if (command == "JOIN")
-            handlejoin(fd, tokens, trailing, *client);
+            handleJoin(fd, tokens, trailing, *client);
         else
-            sendResponse(fd, ERR_UNKNOWNCOMMAND(std::string("*")));
+            sendResponse(fd, ERR_UNKNOWNCOMMAND(client->getNickName(), command));
     } else
-        sendResponse(fd, ERR_NOTREGISTERED(std::string("*")));
+        sendResponse(fd, ERR_NOTREGISTERED(client->getNickName()));
 
 }
 
@@ -115,7 +115,7 @@ void Server::addChannel(Channel *channel) {
 Client *Server::getClientNick(std::string &nick) {
 
     for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        if (it->second.getNickname() == nick)
+        if (it->second.getNickName() == nick)
             return &(it->second);
     }
     return (NULL);

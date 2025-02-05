@@ -53,7 +53,7 @@ void Channel::removeOperator(Client *client) {
 
 bool Channel::isMember(Client *client) const {
     for (size_t i = 0; i < _members.size(); ++i) {
-        if (_members[i].getNickname() == client->getNickname()) {
+        if (_members[i].getNickName() == client->getNickName()) {
             return true;
         }
     }
@@ -69,7 +69,7 @@ bool Channel::isOperator(Client *client) const {
     return false;
 }
 bool Channel::isInvited(Client *client, std::string name, int flg) const {
-    if (client->getinvitechannel(name)){
+    if (client->getInviteChannel(name)){
         if (flg == 1){
             client->removeChannelInvite(name);
         }

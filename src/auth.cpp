@@ -1,11 +1,10 @@
 #include "../include/Server.hpp"
 
 // pass
-void Server::pass(std::vector<std::string> &tokens, Client &client) {
+void Server::handlePass(int fd, std::vector<std::string> &tokens, Client &client) {
 
-    int fd = client.getFd();
     if (tokens.size() == 1) {
-        sendResponse(fd, ERR_NEEDMOREPARAMS(tokens[0]));
+        sendResponse(fd, ERR_NEEDMOREPARAMS(std::string("*"), tokens[0]));
         return;
     }
     if (client.isRegistered()) {
@@ -20,9 +19,9 @@ void Server::pass(std::vector<std::string> &tokens, Client &client) {
 }
 
 // nickname
-bool Server::isNicknameInUse(const std::string& nickname) {
+bool Server::isNickNameInUse(const std::string& nickname) {
     for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        if (it->second.getNickname() == nickname) {
+        if (it->second.getNickName() == nickname) {
             return true;
         }
     }
@@ -37,49 +36,47 @@ bool nickNameValid(std::string &name) {
     return true;
 }
 
-void Server::nick(std::vector<std::string> &tokens, Client &client) {
+void Server::handleNick(int fd, std::vector<std::string> &tokens, Client &client) {
 
-    int fd = client.getFd();
     if (client.getPassword().empty()) {
         sendResponse(fd, ERR_NOTREGISTERED(std::string(std::string("*"))));
         return;
     }
     if (tokens.size() == 1) {
-        sendResponse(fd, ERR_NEEDMOREPARAMS(std::string(tokens[0])));
+        sendResponse(fd, ERR_NEEDMOREPARAMS(std::string("*"), tokens[0]));
         return;
     }
     if (!nickNameValid(tokens[1])) {
         sendResponse(fd, ERR_ERRONEUSNICKNAME(tokens[1]));
         return;
     }
-    if (isNicknameInUse(tokens[1])) {
+    if (isNickNameInUse(tokens[1])) {
         sendResponse(fd, ERR_NICKNAMEINUSE(tokens[1]));
         return;
     }
     client.setNickName(tokens[1]);
     
-    if (!client.getPassword().empty() && !client.getNickname().empty() && !client.getUsername().empty()) {
+    if (!client.getPassword().empty() && !client.getNickName().empty() && !client.getUserName().empty()) {
         client.setRegistered(true);
-        sendResponse(fd, RPL_WELCOME(client.getNickname(), client.getUsername(), client.getHostname()));
+        sendResponse(fd, RPL_WELCOME(client.getNickName(), client.getUserName(), client.getHostName(), client.getIpAddress()));
     }
 }
 
 // username
-void Server::user(std::vector<std::string> &tokens, std::string &trailing, Client &client) {
+void Server::handleUser(int fd, std::vector<std::string> &tokens, std::string &trailing, Client &client) {
 
-    int fd = client.getFd();
     if (client.getPassword().empty()) {
         sendResponse(fd, ERR_NOTREGISTERED(std::string(std::string("*"))));
         return;
     }
     if (tokens.size() == 1) {
-        sendResponse(fd, ERR_NEEDMOREPARAMS(std::string(tokens[0])));
+        sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));
         return;
     }
     client.setUserName(tokens[1]);
     client.setRealName(trailing);
-    if (!client.getPassword().empty() && !client.getNickname().empty() && !client.getUsername().empty()) {
+    if (!client.getPassword().empty() && !client.getNickName().empty() && !client.getUserName().empty()) {
         client.setRegistered(true);
-        sendResponse(fd, RPL_WELCOME(client.getNickname(), client.getUsername(), client.getHostname()));
+        sendResponse(fd, RPL_WELCOME(client.getNickName(), client.getUserName(), client.getHostName(), client.getIpAddress()));
     }
 }

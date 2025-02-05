@@ -37,11 +37,11 @@ class Server {
 		int _port;
 		int _socket;
 		static int _break;
-		struct sockaddr_in serverAddress;
+		struct sockaddr_in _serverAddress;
 		struct pollfd _poll;
 		std::string _password;
 		std::map<int, Client> _clients;
-		std::vector<struct pollfd> _pollfds;
+		std::vector<struct pollfd> _pollFds;
 		std::vector<Channel*> _channels;
 
 	public:
@@ -58,7 +58,7 @@ class Server {
 		Channel 					*getChannel(std::string &name);
 		std::vector<std::string> 	parseData(Client* client);
 		void 						parseCommand(int fd, std::string input);
-		bool 						isNicknameInUse(const std::string& nickname);
+		bool 						isNickNameInUse(const std::string& nickname);
 		void 						sendResponse(int fd, const std::string& response);
 		void 						handleBuffer(int fd, std::string &buffer);
 		std::vector<std::string> 	split(const std::string& str, const std::string& delimiters);
@@ -68,16 +68,11 @@ class Server {
 		void						handleNick(int fd, std::vector<std::string> &tokens, Client &client);
 		void						handleUser(int fd, std::vector<std::string> &tokens, std::string &trailing, Client &client);
 		void						handleTopic(int fd, std::vector<std::string> tokens, std::string &trailing, Client &client);
-		void						handlejoin(int fd, std::vector<std::string>& tokens, std::string& trailing, Client& client);
+		void						handlePrivmsg(int fd, std::vector<std::string>& tokens, std::string& trailing, Client& client);
+		void						handleJoin(int fd, std::vector<std::string>& tokens, std::string& trailing, Client& client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
 		
-		// handle commands
-		void						pass(std::vector<std::string> &tokens, Client &client);
-		void						nick(std::vector<std::string> &tokens, Client &client);
-		void						user(std::vector<std::string> &tokens, std::string &trailing, Client &client);
-		void						topic(std::vector<std::string> tokens, std::string &trailing, Client &client);
-		void    					privmsg(std::vector<std::string> &tokens, std::string &trailing, Client &client);
 
 		Client						*getClientNick(std::string &nick);
 };

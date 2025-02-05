@@ -46,9 +46,9 @@ Server::Server(char** av) {
 void Server::serverSocket() 
 {
     //add comment later
-    serverAddress.sin_family = AF_INET; //ipv4
-    serverAddress.sin_port = htons(_port); // network byte order
-    serverAddress.sin_addr.s_addr = INADDR_ANY; // any local machine
+    _serverAddress.sin_family = AF_INET; //ipv4
+    _serverAddress.sin_port = htons(_port); // network byte order
+    _serverAddress.sin_addr.s_addr = INADDR_ANY; // any local machine
     _socket = socket(AF_INET, SOCK_STREAM, 0); // server socket fd
     if(_socket == -1)
 		throw(std::runtime_error("socket creation failed"));
@@ -61,7 +61,7 @@ void Server::serverSocket()
     check = fcntl(_socket, F_SETFL, O_NONBLOCK);
     if (check == -1)
         throw(std::runtime_error("setting option(O_NONBLOCK) failed"));
-    check = bind(_socket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)); //bind the socket to the address
+    check = bind(_socket, (struct sockaddr *)&_serverAddress, sizeof(_serverAddress)); //bind the socket to the address
     if (check == -1) 
         throw(std::runtime_error("binding socket failed"));
     check = listen(_socket, SOMAXCONN); // listen for  connections && the socket a passive socket
@@ -71,7 +71,7 @@ void Server::serverSocket()
     _poll.fd = _socket;
     _poll.events = POLLIN; // for reading
     _poll.revents = 0;
-    _pollfds.push_back(_poll);
+    _pollFds.push_back(_poll);
     std::cout << MAGENTA << "SERVER STARTED :   " << _socket << RESET <<"    waiting for connection " <<std::endl;
 
 }
@@ -99,27 +99,29 @@ void Server::accept_cl()
     newPoll.fd = clientFd;
     newPoll.events = POLLIN;
     newPoll.revents = 0;
-    _pollfds.push_back(newPoll);
+    _pollFds.push_back(newPoll);
     _clients[clientFd] = Client(clientFd);
+    _clients[clientFd].setIpAddress(inet_ntoa(clientAddr.sin_addr));
+    std::cout << "New client connected: " << clientFd << std::endl;
 }
 
 
 void Server::receive(size_t & i)
 {
     char buffer[1024];
-    int bytes = recv(_pollfds[i].fd, buffer, sizeof(buffer) - 1, 0);
+    int bytes = recv(_pollFds[i].fd, buffer, sizeof(buffer) - 1, 0);
 
     if (bytes <= 0) {
         // Client disconnected
-        close(_pollfds[i].fd);
-        _clients.erase(_pollfds[i].fd);
-        _pollfds.erase(_pollfds.begin() + i);
+        close(_pollFds[i].fd);
+        _clients.erase(_pollFds[i].fd);
+        _pollFds.erase(_pollFds.begin() + i);
         i--;
     } else {
         buffer[bytes] = '\0';
         std::cout << "BUFFER : " << buffer << std::endl;
         std::string buff(buffer);
-        handleBuffer(_pollfds[i].fd, buff);
+        handleBuffer(_pollFds[i].fd, buff);
     }
 }
 
@@ -131,7 +133,7 @@ void Server::setup() {
     this->serverSocket();
 
     while (!_break) {
-        int poll_result = poll(&_pollfds[0], _pollfds.size(), -1);
+        int poll_result = poll(&_pollFds[0], _pollFds.size(), -1);
         if (poll_result == -1) {
             if (errno != EINTR) {
                 throw std::runtime_error("poll() failed");
@@ -139,9 +141,9 @@ void Server::setup() {
             continue;
         }
 
-        for (size_t i = 0; i < _pollfds.size(); i++) {
-            if (_pollfds[i].revents & POLLIN) {
-                if (_pollfds[i].fd == _socket) {
+        for (size_t i = 0; i < _pollFds.size(); i++) {
+            if (_pollFds[i].revents & POLLIN) {
+                if (_pollFds[i].fd == _socket) {
                     // Accept new client
                     accept_cl();
                 } else {

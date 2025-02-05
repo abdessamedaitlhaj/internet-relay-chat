@@ -2,12 +2,12 @@
 #include "../../include/numericReplies.hpp"
 #include "../../include/Channel.hpp"
 
-void Server::handlejoin(int fd, std::vector<std::string>& tokens, std::string& trailing, Client& client)
+void Server::handleJoin(int fd, std::vector<std::string>& tokens, std::string& trailing, Client& client)
 {
     //need more params
     if (tokens.size() < 2)
     {
-        sendResponse(fd, ERR_NEEDMOREPARAMS(tokens[0]));
+        sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));
         return ;
     }
     // if (tokens[1] == "0")
@@ -56,7 +56,7 @@ void Server::handlejoin(int fd, std::vector<std::string>& tokens, std::string& t
         // if (channel_name.empty() || (channel_name[0] != '#' && channel_name[0] != '&'))
         if (channel_name[0] != '#' && channel_name[0] != '&')
         {
-            sendResponse(fd, ERR_NOSUCHCHANNEL(channel_name));
+            sendResponse(fd, ERR_NOSUCHCHANNEL(client.getNickName(), channel_name));
             continue ;
         }
         Channel *channel = getChannel(channel_name);
@@ -74,7 +74,7 @@ void Server::handlejoin(int fd, std::vector<std::string>& tokens, std::string& t
                 continue ;
             if (channel->getInviteOnly() && !channel->isInvited(&client, channel_name, 1))
             {
-                sendResponse(fd, ERR_INVITEONLYCHAN(channel_name));
+                sendResponse(fd, ERR_INVITEONLYCHAN(client.getNickName(), channel_name));
                 continue ;
             }
         }
