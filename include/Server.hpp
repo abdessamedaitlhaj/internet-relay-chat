@@ -64,12 +64,13 @@ class Server {
 		std::vector<std::string> 	split(const std::string& str, const std::string& delimiters);
 		
 		// AUTH
-		void						handlePass(int fd, std::vector<std::string> &tokens, Client &client);
-		void						handleNick(int fd, std::vector<std::string> &tokens, Client &client);
-		void						handleUser(int fd, std::vector<std::string> &tokens, std::string &trailing, Client &client);
-		void						handleTopic(int fd, std::vector<std::string> tokens, std::string &trailing, Client &client);
-		void						handlePrivmsg(int fd, std::vector<std::string>& tokens, std::string& trailing, Client& client);
-		void						handleJoin(int fd, std::vector<std::string>& tokens, std::string& trailing, Client& client);
+		void						handlePass(int fd, std::string &input, Client &client);
+		void						handleNick(int fd, std::string &input, Client &client);
+		void						handleUser(int fd, std::string &input, Client &client);
+		void						handleTopic(int fd, std::string &input, Client &client);
+		void						handlePrivmsg(int fd, std::string &input, Client& client);
+		void						handleJoin(int fd, std::string &input, Client& client);
+		void						handleMode(int fd, std::string &input, Client &client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
 		

@@ -1,9 +1,12 @@
 #include "../../include/Server.hpp"
-#include "../../include/numericReplies.hpp"
-#include "../../include/Channel.hpp"
 
-void Server::handleJoin(int fd, std::vector<std::string>& tokens, std::string& trailing, Client& client)
+void Server::handleJoin(int fd, std::string &input, Client& client)
 {
+    std::vector<std::string> tokens;
+
+    tokens = Server::split(input, std::string("\t "));
+
+
     //need more params
     if (tokens.size() < 2)
     {

@@ -15,5 +15,8 @@
 #define ERR_NOTEXTTOSEND(nickName) ": 412 " + nickName + " :No text to send" + CRLF
 #define RPL_WELCOME(nickName, userName, hostName, ip) ": 001 " + nickName + " :Welcome to the Internet Relay Network " + hostName + ip + CRLF
 #define RPL_NOTOPIC(nickName, hostName, ip, channelName) ":@" + ip + " 331 " + nickName + " #" + channelName + " :No topic is set" + CRLF
-#define RPL_TOPIC(nickName, hostName, ip, channelName, topic) ":" + hostName + ip + nickName + " #" + channelName + " :" + topic + CRLF
+#define RPL_TOPIC(nickName, hostName, ip, channelName, topic) ":" + hostName + ip + " " + nickName + " #" + channelName + " :" + topic + CRLF
 #define ERR_INVITEONLYCHAN(nickName, channelName) ": 473 " + nickName + " #" + channelName + " :Cannot join channel (+i)" + CRLF
+#define RPL_CHANNELMODEIS(nickName, channelName, mode) ": 324 " + nickName + " #" + channelName + " " + mode + CRLF
+#define RPL_CREATIONTIME(nickName, channelName, time) ": 329 " + nickName + " #" + channelName + " " + time + CRLF
+#define ERR_CHANOPRIVSNEEDED(nickName, channelName) ": 482 " + nickName + " #" + channelName + " :You're not channel operator" + CRLF

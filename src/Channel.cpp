@@ -96,7 +96,3 @@ void Channel::broadcast(const std::string &message, Client *sender) const {
     }
 }
 
-// void Channel::sendToClient(Client *client, const std::string &message) const {
-//     // Send message to client
-// }
-

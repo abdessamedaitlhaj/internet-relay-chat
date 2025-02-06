@@ -1,6 +1,10 @@
 #include "../../include/Server.hpp"
 
-void    Server::handlePrivmsg(int fd, std::vector<std::string> &tokens, std::string &trailing, Client &client) {
+void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
+
+    std::vector<std::string> tokens;
+
+    tokens = Server::split(input, std::string("\t "));
 
     if (tokens.size() == 1) {
         sendResponse(fd, ERR_NORECIPIENT(client.getNickName()));
@@ -16,19 +20,22 @@ void    Server::handlePrivmsg(int fd, std::vector<std::string> &tokens, std::str
         return;
     }
     else {
+        std::string last = tokens[tokens.size() - 1];
+        size_t pos = last.find(":");
+        std::string trailing = pos != std::string::npos ? last.substr(pos + 1) : last;
         if (tokens[1][0] == '#') {
             Channel *channel = getChannel(target);
             if (!channel->isMember(&client)) {
                 sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), target));
                 return;
             }
-            std::string response = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " PRIVMSG " + target + " :" + trailing + CRLF;
-            channel->broadcast(response);
+            std::string response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG " + target + " :" + trailing + CRLF;
+            channel->broadcast(response, &client);
         }
         else {
-            std::string response = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " PRIVMSG " + target + " :" + trailing + CRLF;
+            std::string response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG " + target + " :" + trailing + CRLF;
             Client *cli = getClientNick(target);
-            sendResponse(cli->getFd(), ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " PRIVMSG " + target + " :" + trailing);
+            sendResponse(cli->getFd(), response);
         }
     }
 }

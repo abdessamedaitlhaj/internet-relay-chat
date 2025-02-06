@@ -15,7 +15,11 @@ bool    Server::channelNameValid(std::string &channelName) {
     return true;
 }
 
-void Server::handleTopic(int fd, std::vector<std::string> tokens, std::string &trailing, Client &client) {
+void Server::handleTopic(int fd, std::string &input, Client &client) {
+
+    std::vector<std::string> tokens;
+
+    tokens = Server::split(input, std::string("\t "));
 
     if (tokens.size() == 1) {
         sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));
@@ -52,8 +56,10 @@ void Server::handleTopic(int fd, std::vector<std::string> tokens, std::string &t
     //     sendResponse(fd, ERR_CHANOPRIVSNEEDED(channelName));
     //     return;
     // }
-
+    std::string last = tokens[tokens.size() - 1];
+    size_t pos = last.find(":");
+    std::string trailing = pos != std::string::npos ? last.substr(pos + 1) : last;
     channel->setTopic(trailing);
     std::string response = ":" + client.getHostName() + client.getIpAddress() + " TOPIC #" + channelName + " :" + trailing + CRLF;
-    channel->broadcast(response);
+    channel->broadcast(response, &client);
 }

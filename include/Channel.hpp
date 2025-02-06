@@ -44,5 +44,5 @@ class Channel {
         void setMode(char mode, bool enable);
         bool hasMode(char mode) const;
 
-        void broadcast(const std::string &message, Client *sender = nullptr) const;
+        void broadcast(const std::string &message, Client *sender) const;
 };

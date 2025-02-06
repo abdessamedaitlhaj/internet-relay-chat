@@ -57,46 +57,36 @@ std::vector<std::string> Server::split(const std::string& str, const std::string
 void Server::parseCommand(int fd, std::string input) {
 
     Client* client = getClient(fd);
-    std::string command, params, trailing;
+    std::string command, params;
     std::vector<std::string> tokens;
-    size_t pos = 0;
 
     if (!client || input.empty())
         return;
-    pos = input.find(":");
-    if (pos != std::string::npos) {
-        tokens = Server::split(input.substr(0, pos), std::string("\t "));
-        command = tokens[0];
-        trailing = input.substr(pos);
-    } else {
-        tokens = Server::split(input, std::string("\t "));
-        command = tokens[0];
-        if (tokens.size() > 2)
-            trailing = tokens[2];
-    }
-
+    tokens = Server::split(input, std::string("\t "));
+    command = tokens[0];
     for (size_t i = 0; i < command.length(); ++i) {
         command[i] = toupper(command[i]);
     }
 
-
     if (command == "PASS")
-        handlePass(fd, tokens, *client);
+        handlePass(fd, input, *client);
     else if (command == "NICK")
-        handleNick(fd, tokens, *client);
+        handleNick(fd, input, *client);
     else if (command == "USER")
-        handleUser(fd, tokens, trailing, *client);
+        handleUser(fd, input, *client);
     else if (client->isRegistered()) {
         if (command == "TOPIC")
-            handleTopic(fd, tokens, trailing, *client);
+            handleTopic(fd, input, *client);
         else if (command == "PRIVMSG")
-            handlePrivmsg(fd, tokens, trailing, *client);
+            handlePrivmsg(fd, input, *client);
+        // else if (command == "MODE")
+        //     handleMode(fd, input, *client);
         else if (command == "JOIN")
-            handleJoin(fd, tokens, trailing, *client);
+            handleJoin(fd, input, *client);
         else
             sendResponse(fd, ERR_UNKNOWNCOMMAND(client->getNickName(), command));
     } else
-        sendResponse(fd, ERR_NOTREGISTERED(client->getNickName()));
+        sendResponse(fd, ERR_NOTREGISTERED(std::string("*")));
 
 }
 
