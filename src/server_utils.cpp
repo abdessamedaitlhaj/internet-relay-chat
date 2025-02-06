@@ -62,12 +62,17 @@ void Server::parseCommand(int fd, std::string input) {
 
     if (!client || input.empty())
         return;
+    size_t pos = input.find_first_not_of("\t ");
+    if (pos != std::string::npos)
+        input = input.substr(pos);
     tokens = Server::split(input, std::string("\t "));
     command = tokens[0];
     for (size_t i = 0; i < command.length(); ++i) {
         command[i] = toupper(command[i]);
     }
 
+
+    std::cout << "INPUT : " << input << std::endl;
     if (command == "PASS")
         handlePass(fd, input, *client);
     else if (command == "NICK")
