@@ -115,3 +115,12 @@ Client *Server::getClientNick(std::string &nick) {
     }
     return (NULL);
 }
+
+Client *Server::getClientUserName(std::string &nick) {
+
+    for (size_t i = 0; i < _clients.size(); i++) {
+        if (_clients[i].getUserName() == nick)
+            return (&_clients[i]);
+    }
+    return (NULL);
+}

@@ -23,6 +23,11 @@
 #include <iomanip>
 #include <cstdlib>
 
+#include <ifaddrs.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netdb.h>
+
 // Define colors
 #define RESET   "\e[0m"
 #define RED     "\e[1;31m"
@@ -47,6 +52,7 @@ class Server {
 		std::map<int, Client> _clients;
 		std::vector<struct pollfd> _pollFds;
 		std::vector<Channel*> _channels;
+		std::string _serverName;
 
 	public:
 		Server(char** av);
@@ -81,4 +87,5 @@ class Server {
 		
 
 		Client						*getClientNick(std::string &nick);
+		Client						*getClientUserName(std::string &nick);
 };
