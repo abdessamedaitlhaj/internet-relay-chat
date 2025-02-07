@@ -20,3 +20,4 @@
 #define RPL_CHANNELMODEIS(nickName, channelName, mode) ": 324 " + nickName + " #" + channelName + " " + mode + CRLF
 #define RPL_CREATIONTIME(nickName, channelName, time) ": 329 " + nickName + " #" + channelName + " " + time + CRLF
 #define ERR_CHANOPRIVSNEEDED(nickName, channelName) ": 482 " + nickName + " #" + channelName + " :You're not channel operator" + CRLF
+#define RPL_TOPICWHOTIME(nickName, channelName, who, time) ":@localhost 333 " + nickName + " #" + channelName + " " + who + " " + time + CRLF

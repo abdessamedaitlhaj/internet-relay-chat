@@ -18,6 +18,10 @@
 #include <stdexcept>
 #include <sstream>
 #include <algorithm>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
+#include <cstdlib>
 
 // Define colors
 #define RESET   "\e[0m"
@@ -61,7 +65,7 @@ class Server {
 		bool 						isNickNameInUse(const std::string& nickname);
 		void 						sendResponse(int fd, const std::string& response);
 		void 						handleBuffer(int fd, std::string &buffer);
-		std::vector<std::string> 	split(const std::string& str, const std::string& delimiters);
+		std::vector<std::string> 	split(const std::string &str, const std::string &delimiters);
 		
 		// AUTH
 		void						handlePass(int fd, std::string &input, Client &client);
@@ -73,6 +77,7 @@ class Server {
 		void						handleMode(int fd, std::string &input, Client &client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
+		std::string 				getMsg(std::vector<std::string> &tokens);
 		
 
 		Client						*getClientNick(std::string &nick);

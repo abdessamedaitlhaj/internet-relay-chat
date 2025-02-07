@@ -20,6 +20,7 @@ class Channel {
         std::string _topic;
         std::vector<Client> _members;
         std::vector<Client> _operators;
+        time_t _topicTime;
         
         //void sendToClient(Client *client, const std::string &message) const;
 
@@ -29,9 +30,16 @@ class Channel {
 
         std::string getName() const;
         std::string getTopic() const;
+        bool getTopicRestriction() const;
         bool getInviteOnly() const;
+        bool getMode(char mode) const;
+        time_t getTopicTime() const;
+
+        void setTopicRestriction(bool topicRestriction);
 
         void setTopic(const std::string &topic);
+        void setTopicTime(time_t topicTime);
+        
 
         void addMember(Client *client);
         void removeMember(Client *client);

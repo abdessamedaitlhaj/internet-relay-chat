@@ -34,7 +34,7 @@ void Server::sendResponse(int fd, const std::string& response) {
     }
 }
 
-std::vector<std::string> Server::split(const std::string& str, const std::string& delimiters) {
+std::vector<std::string> Server::split(const std::string &str, const std::string &delimiters) {
 
     std::vector<std::string> tokens;
     size_t start = str.find_first_not_of(delimiters);

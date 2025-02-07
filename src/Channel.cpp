@@ -21,9 +21,23 @@ bool Channel::getInviteOnly() const {
     return _inviteOnly;
 }
 
+bool Channel::getTopicRestriction() const {
+    return _topicRestriction;
+}
+
+time_t Channel::getTopicTime() const {
+    return _topicTime;
+}
+
+void Channel::setTopicRestriction(bool topicRestriction) {
+    _topicRestriction = topicRestriction;
+}
+
 void Channel::setTopic(const std::string &topic) {
     _topic = topic;
+    _topicTime = time(NULL);
 }
+
 
 void Channel::addMember(Client *client) {
     _members.push_back(*client);

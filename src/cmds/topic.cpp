@@ -20,9 +20,11 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
     size_t trailingPos;
     std::string trailing;
 
-    trailingPos = input.find(" :");
+    trailingPos = input.find_first_of(":");
     trailing = trailingPos != std::string::npos ? input.substr(trailingPos + 1) : "";
-
+    if (!trailing.empty()) {
+        input = input.substr(0, trailingPos);
+    }
     std::vector<std::string> tokens = split(input, std::string("\t "));
 
     if (tokens.size() == 1) {
@@ -54,16 +56,22 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
         }
         return;
     }
-
-    // Check topic restrictions
-    // if (channel->isTopicRestricted() && !channel->isOperator(client.getNickname())) {
-    //     sendResponse(fd, ERR_CHANOPRIVSNEEDED(channelName));
-    //     return;
-    // }
-    std::string last = tokens[tokens.size() - 1];
-    size_t pos = last.find(":");
-    trailing = pos != std::string::npos ? last.substr(pos + 1) : last;
+    if (channel->hasMode('t') && !channel->isOperator(&client)) {
+        sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channelName));
+        return;
+    }
+    std::string last;
+    size_t pos;
+    if (tokens.size() > 3) {
+        trailing = getMsg(tokens);
+    }
+    else {
+        last = tokens[2];
+        pos  = last.find_first_of(":");
+        trailing = pos != std::string::npos ? last.substr(pos + 1) : last;
+    }
     channel->setTopic(trailing);
     std::string response = ":" + client.getHostName() + client.getIpAddress() + " TOPIC #" + channelName + " :" + trailing + CRLF;
     channel->broadcast(response, &client);
+    channel->broadcast(RPL_TOPICWHOTIME(client.getNickName(), channelName, client.getNickName(), std::to_string(channel->getTopicTime())), &client);
 }
