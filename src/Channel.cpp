@@ -24,9 +24,21 @@ bool Channel::getInviteOnly() const {
 std::string Channel::getPassword() const {
     return _password;
 }
+bool Channel::getTopicRestriction() const {
+    return _topicRestriction;
+}
+
+time_t Channel::getTopicTime() const {
+    return _topicTime;
+}
+
+void Channel::setTopicRestriction(bool topicRestriction) {
+    _topicRestriction = topicRestriction;
+}
 
 void Channel::setTopic(const std::string &topic) {
     _topic = topic;
+    _topicTime = time(NULL);
 }
 
 void Channel::setPassword(const std::string &password) {

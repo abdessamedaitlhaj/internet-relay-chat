@@ -21,6 +21,7 @@ class Channel {
         std::vector<Client> _members;
         std::vector<Client> _operators;
         std::string _password;
+        time_t _topicTime;
         
         //void sendToClient(Client *client, const std::string &message) const;
 
@@ -30,11 +31,19 @@ class Channel {
 
         std::string getName() const;
         std::string getTopic() const;
+        bool getTopicRestriction() const;
         bool getInviteOnly() const;
         std::string getPassword() const;
+        
+        void setPassword(const std::string &password);
+        bool getMode(char mode) const;
+        time_t getTopicTime() const;
+
+        void setTopicRestriction(bool topicRestriction);
 
         void setTopic(const std::string &topic);
-        void setPassword(const std::string &password);
+        void setTopicTime(time_t topicTime);
+        
 
         void addMember(Client *client);
         void removeMember(Client *client);

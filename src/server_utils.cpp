@@ -34,7 +34,7 @@ void Server::sendResponse(int fd, const std::string& response) {
     }
 }
 
-std::vector<std::string> Server::split(const std::string& str, const std::string& delimiters) {
+std::vector<std::string> Server::split(const std::string &str, const std::string &delimiters) {
 
     std::vector<std::string> tokens;
     size_t start = str.find_first_not_of(delimiters);
@@ -112,6 +112,15 @@ Client *Server::getClientNick(std::string &nick) {
     for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
         if (it->second.getNickName() == nick)
             return &(it->second);
+    }
+    return (NULL);
+}
+
+Client *Server::getClientUserName(std::string &nick) {
+
+    for (size_t i = 0; i < _clients.size(); i++) {
+        if (_clients[i].getUserName() == nick)
+            return (&_clients[i]);
     }
     return (NULL);
 }
