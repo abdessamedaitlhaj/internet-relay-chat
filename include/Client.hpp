@@ -20,7 +20,7 @@ class Client {
         std::string _buffer;
         std::string _ipAddress;
         std::vector<Channel*> _channels;
-
+        std::vector<std::string> InviteChannels;
     public:
         Client();
         Client(int fd);

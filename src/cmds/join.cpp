@@ -36,20 +36,21 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
     }
     pairs_channels.push_back(std::make_pair(buffer, ""));
     //split passwords
-    if (!passwords.empty())
-    {
+    if (!passwords.empty()) {
         buffer.clear();
-        for (size_t i = 0; i < passwords.length(); i++)
-        {
-            if (passwords[i] == ',')
-            {
-                pairs_channels[pairs_channels.size() - 1].second = buffer;
+        size_t j = 0;
+        for (size_t i = 0; i < passwords.length(); i++) {
+            if (passwords[i] == ',') {
+                if (j < pairs_channels.size())
+                    pairs_channels[j].second = buffer;
+                j++;
                 buffer.clear();
-            }
-            else
+            } else {
                 buffer += passwords[i];
+            }
         }
-        pairs_channels[pairs_channels.size() - 1].second = buffer;
+        if (j < pairs_channels.size())
+            pairs_channels[j].second = buffer;
     }
     //channel processing
     for (size_t i = 0; i < pairs_channels.size(); i++)
@@ -65,21 +66,33 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
         Channel *channel = getChannel(channel_name);
         if (!channel)
         {
-            // channel = new Channel(channel_name);
-            // _channels.push_back(channel);
-            // // add user
-            // // make him the admin of the channel
-            // if (channel->isoperator(&client))
+            channel = new Channel(channel_name);
+            _channels.push_back(channel);
+            channel->addMember(&client);
         }
         else
         {
             if (channel->isMember(&client))
                 continue ;
-            if (channel->getInviteOnly() && !channel->isInvited(&client, channel_name, 1))
+            if (channel->getInviteOnly())
             {
-                sendResponse(fd, ERR_INVITEONLYCHAN(client.getNickName(), channel_name));
-                continue ;
+                if(!channel->isInvited(&client, channel_name, 1))
+                {
+                    sendResponse(fd, ERR_INVITEONLYCHAN(client.getNickName(), channel_name));
+                    continue ;
+                }
             }
+            std::cout << "getPassword: " << channel->getPassword() << std::endl;
+            std::cout << "password: " << password << std::endl;
+            if (!channel->getPassword().empty() && channel->getPassword() != password)
+            {
+                if (!channel->isInvited(&client, channel_name, 0))
+                {
+                    sendResponse(fd, ERR_PASSMISMATCH(client.getNickName()));
+                    continue ;
+                }
+            }
+            channel->addMember(&client);
         }
     }
 }

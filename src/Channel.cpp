@@ -21,8 +21,16 @@ bool Channel::getInviteOnly() const {
     return _inviteOnly;
 }
 
+std::string Channel::getPassword() const {
+    return _password;
+}
+
 void Channel::setTopic(const std::string &topic) {
     _topic = topic;
+}
+
+void Channel::setPassword(const std::string &password) {
+    _password = password;
 }
 
 void Channel::addMember(Client *client) {

@@ -19,9 +19,9 @@ bool Client::isRegistered() const {
 
 bool Client::getInviteChannel(const std::string& name) const
 {
-    for (size_t i = 0; i < _channels.size(); i++)
+    for (size_t i = 0; i < InviteChannels.size(); i++)
     {
-        if (_channels[i]->getName() == name)
+        if (InviteChannels[i] == name)
             return true;
     }
     return false;
@@ -94,11 +94,11 @@ void Client::clearBuffer() {
 }
 
 void Client::removeChannelInvite(std::string &name) {
-    for (size_t i = 0; i < _channels.size(); i++)
+    for (size_t i = 0; i < InviteChannels.size(); i++)
     {
-        if (_channels[i]->getName() == name)
+        if (InviteChannels[i] == name)
         {
-            _channels.erase(_channels.begin() + i);
+            InviteChannels.erase(InviteChannels.begin() + i);
             return ;
         }
     }
