@@ -92,13 +92,13 @@ void Server::breakSignal(int signum)
 }
 
 
-void Server::accept_cl()
+bool Server::accept_cl()
 {
     struct sockaddr_in clientAddr;
     socklen_t clientLen = sizeof(clientAddr);
     int clientFd = accept(_socket, (struct sockaddr*)&clientAddr, &clientLen);
     // or continue check later
-    if (clientFd < 0) return ;
+    if (clientFd < 0) return false ;
 
     fcntl(clientFd, F_SETFL, O_NONBLOCK);
     struct pollfd newPoll;
@@ -109,6 +109,7 @@ void Server::accept_cl()
     _clients[clientFd] = Client(clientFd);
     _clients[clientFd].setIpAddress(inet_ntoa(clientAddr.sin_addr));
     std::cout << "New client connected: " << clientFd << std::endl;
+    return true ;
 }
 
 
@@ -150,7 +151,8 @@ void Server::setup() {
             if (_pollFds[i].revents & POLLIN) {
                 if (_pollFds[i].fd == _socket) {
                     // Accept new client
-                    accept_cl();
+                    if(!accept_cl())
+                        continue ;
                 } else {
                     // Receive data from existing client
                     receive(i);

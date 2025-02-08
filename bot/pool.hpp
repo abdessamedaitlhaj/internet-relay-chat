@@ -21,7 +21,7 @@
 
 #define Q25 "Which Moroccan city was historically an important trading post and is known for its blue fishing boats?\n(a) Essaouira\n(b) Tangier\n(c) Asilah\n(d) Agadir"
 
-// a b c b a
+
 
 #define Q31 "Which Moroccan scientist is credited with the invention of the astrolabe?\n(a) Ibn al-Haytham\n(b) Al-Battani\n(c) Al-Zarqali\n(d) Ibn Rushd"
 
@@ -34,7 +34,7 @@
 #define Q35 "Which ancient city in Morocco is known for its ruins and was once a Roman colony?\n(a) Volubilis\n(b) Meknes\n(c) Fes\n(d) Marrakesh"
 
 
-// c a c a a
+
 
 #define Q41 "Which Moroccan king was responsible for the creation of the Moroccan royal air force in 1958?\n(a) King Hassan II\n(b) King Mohammed VI\n(c) King Mohammed V\n(d) King Moulay Ismail"
 
@@ -46,4 +46,3 @@
 
 #define Q45 "Which international landmark located in Morocco served as a filming location for the famous 2000 movie 'Gladiator'?\n(a) Atlas Mountains\n(b) Ait Benhaddou\n(c) Hassan II Mosque\n(d) Chefchaouen"
 
-// a a a b b

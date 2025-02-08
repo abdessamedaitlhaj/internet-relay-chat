@@ -6,7 +6,6 @@ class QuestionGame {
 	private :
 		struct Question {
 			std::string problem;
-			// std::vector<std::string> answers;
 			char correct;
 		};
 		void  initializeLevel1();
