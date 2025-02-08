@@ -72,7 +72,6 @@ void Server::parseCommand(int fd, std::string input) {
     }
 
 
-    std::cout << "INPUT : " << input << std::endl;
     if (command == "PASS")
         handlePass(fd, input, *client);
     else if (command == "NICK")

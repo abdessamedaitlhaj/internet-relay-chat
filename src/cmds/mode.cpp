@@ -1,8 +1,60 @@
 #include "../..//include/Server.hpp"
 
+
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <queue>
+#include <map>
+
+struct ModeChange {
+    char mode;
+    bool add;
+    std::string argument;
+};
+
+std::vector<ModeChange> parseModes(const std::string& modes, std::queue<std::string>& args) {
+    std::vector<ModeChange> changes;
+    bool currentSign = true; // true for '+', false for '-'
+
+    for (size_t i = 0; i < modes.size(); ++i) {
+        if (modes[i] == '+') {
+            currentSign = true;
+        } else if (modes[i] == '-') {
+            currentSign = false;
+        } else {
+            std::string arg;
+            if ((modes[i] == 'k' || modes[i] == 'l' || modes[i] == 'o') && !args.empty()) {
+                arg = args.front();
+                args.pop();
+            }
+            changes.push_back((ModeChange){modes[i], currentSign, arg});
+        }
+    }
+    return changes;
+}
+
+std::string getAllModes(Channel *channel) {
+    std::string modes;
+    if (channel->getInviteOnly()) {
+        modes += "i";
+    }
+    if (channel->getTopicRestriction()) {
+        modes += "t";
+    }
+    if (channel->getUserLimit()) {
+        modes += "l";
+    }
+    if (channel->getAuth()) {
+        modes += "k";
+    }
+    return modes;
+}
+
 void Server::handleMode(int fd, std::string &input, Client &client) {
 
-
+    std::string modes;
+    std::queue<std::string> args;
     std::vector<std::string> tokens;
 
     tokens = Server::split(input, std::string("\t "));
@@ -18,27 +70,44 @@ void Server::handleMode(int fd, std::string &input, Client &client) {
         return;
     }
     if (tokens.size() == 2 && channel) {
-        sendResponse(fd, RPL_CHANNELMODEIS(client.getNickName(), client.getNickName(), std::string("n yet")));
-        sendResponse(fd, RPL_CREATIONTIME(client.getNickName(), client.getNickName(), std::string("n yet")));
+        modes = getAllModes(channel);
+        sendResponse(fd, RPL_CHANNELMODEIS(client.getNickName(), client.getNickName(), modes));
+        sendResponse(fd, RPL_CREATIONTIME(client.getNickName(), client.getNickName(), std::to_string(channel->getTopicTime())));
     }
-    if (!channel->isMember(&client)) {
-        sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), tokens[1].substr(1)));
+    if (!channel->isOperator(&client)) {
+        sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channelName));
         return;
     }
-    if (tokens.size() == 3) {
-        std::string last = tokens[tokens.size() - 1];
-        size_t pos = last.find(":");
-        std::string trailing = pos != std::string::npos ? last.substr(pos + 1) : last;
-        if (tokens[2] == "+o") {
-            channel->addOperator(&client);
-            sendResponse(fd, RPL_UMODEIS(client.getNickName(), "+o"));
-        } else if (trailing == "-o") {
-            channel->removeOperator(&client);
-            sendResponse(fd, RPL_UMODEIS(client.getNickName(), "-o"));
+    for (size_t i = 3; i < tokens.size(); ++i)
+        args.push(tokens[i]);
+
+    std::vector<ModeChange> modeChanges = parseModes(modes, args);
+
+    for (size_t i = 0; i < modeChanges.size(); ++i) {
+        if (modeChanges[i].mode == 'i') {
+            channel->setTopicRestriction(modeChanges[i].add);
+        } else if (modeChanges[i].mode == 't') {
+            channel->setTopicRestriction(modeChanges[i].add);
+        } else if (modeChanges[i].mode == 'l') {
+            // is int arg
+            if () {
+                channel->setUserLimit(std::stoi(modeChanges[i].argument));
+            }
+            channel->setUserLimit(modeChanges[i].add);
+        } else if (modeChanges[i].mode == 'k') {
+            channel->setAuth(modeChanges[i].add);
+            if (modeChanges[i].add) {
+                channel->setPassword(modeChanges[i].argument);
+            }
+        } else if (modeChanges[i].mode == 'o') {
+            Client *op = getClientNick(modeChanges[i].argument);
+            if (op) {
+                if (modeChanges[i].add) {
+                    channel->addOperator(op);
+                } else {
+                    channel->removeOperator(op);
+                }
+            }
         }
-        }
-    }
-    else {
-        sendResponse(fd, ERR_UMODEUNKNOWNFLAG(client.getNickName()));
     }
 }

@@ -32,6 +32,30 @@ time_t Channel::getTopicTime() const {
     return _topicTime;
 }
 
+bool Channel::getUserLimit() const {
+    return _userLimit;
+}
+
+bool Channel::getAuth() const {
+    return _auth;
+}
+
+int Channel::getLimit() const {
+    return _limit;
+}
+
+void Channel::setInviteOnly(bool inviteOnly) {
+    _inviteOnly = inviteOnly;
+}
+
+void Channel::setLimit(int limit) {
+    _limit = limit;
+}
+
+void Channel::setAuth(bool auth) {
+    _auth = auth;
+}
+
 void Channel::setTopicRestriction(bool topicRestriction) {
     _topicRestriction = topicRestriction;
 }
