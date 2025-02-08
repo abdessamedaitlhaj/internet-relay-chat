@@ -36,6 +36,10 @@ void Channel::setTopicRestriction(bool topicRestriction) {
     _topicRestriction = topicRestriction;
 }
 
+void Channel::setname(const std::string &name) {
+    _name = name;
+}
+
 void Channel::setTopic(const std::string &topic) {
     _topic = topic;
     _topicTime = time(NULL);

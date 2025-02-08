@@ -63,17 +63,26 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
             sendResponse(fd, ERR_NOSUCHCHANNEL(client.getNickName(), channel_name));
             continue ;
         }
-        Channel *channel = getChannel(channel_name);
+        std::string _channel_name = channel_name.substr(1);
+        Channel *channel = getChannel(_channel_name);
+        std::cout << "channel_name: " << _channel_name << std::endl;
         if (!channel)
         {
-            channel = new Channel(channel_name);
-            _channels.push_back(channel);
-            channel->addMember(&client);
+            Channel *new_channel = new Channel(_channel_name);
+            new_channel->setname(_channel_name);
+            new_channel->isOperator(&client);
+            _channels.push_back(new_channel);
+            new_channel->addMember(&client);
+            channel = new_channel;
+            std::cout << "channel created" <<  new_channel->getName() << std::endl;
         }
         else
         {
             if (channel->isMember(&client))
+            {
+                std::cout << "isMember" << std::endl;
                 continue ;
+            }
             if (channel->getInviteOnly())
             {
                 if(!channel->isInvited(&client, channel_name, 1))

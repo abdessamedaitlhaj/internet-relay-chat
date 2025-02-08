@@ -1,4 +1,4 @@
-CPPFLAGS = #-Wall -Wextra -Werror -std=c++98
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 CPPFLAGS += -fsanitize=address
 SRC = main.cpp	src/Client.cpp src/Server.cpp src/auth.cpp src/Channel.cpp src/cmds/topic.cpp src/cmds/join.cpp src/server_utils.cpp src/cmds/privmsg.cpp 
 OBJ = $(SRC:.cpp=.o)

@@ -40,6 +40,7 @@ class Channel {
         time_t getTopicTime() const;
 
         void setTopicRestriction(bool topicRestriction);
+        void setname(const std::string &name);
 
         void setTopic(const std::string &topic);
         void setTopicTime(time_t topicTime);
