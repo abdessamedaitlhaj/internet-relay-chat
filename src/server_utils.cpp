@@ -79,6 +79,8 @@ void Server::parseCommand(int fd, std::string input) {
     else if (command == "USER")
         handleUser(fd, input, *client);
     else if (client->isRegistered()) {
+        client->setStart();
+        
         if (command == "TOPIC")
             handleTopic(fd, input, *client);
         else if (command == "PRIVMSG")
