@@ -70,4 +70,5 @@ class Channel {
 
         void broadcast(const std::string &message, Client *sender) const;
         std::string ChannelsclientList();
+        void broadcastToAll(const std::string &message) const;
 };

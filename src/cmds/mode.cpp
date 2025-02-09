@@ -1,12 +1,5 @@
 #include "../..//include/Server.hpp"
 
-
-#include <iostream>
-#include <sstream>
-#include <vector>
-#include <queue>
-#include <map>
-
 struct ModeChange {
     char mode;
     bool add;
@@ -17,7 +10,7 @@ std::vector<ModeChange> parseModes(const std::string& modes, std::queue<std::str
     std::vector<ModeChange> changes;
     bool currentSign = true; // true for '+', false for '-'
 
-    for (size_t i = 0; i < modes.size(); ++i) {
+    for (size_t i = 0; i < modes.length(); ++i) {
         if (modes[i] == '+') {
             currentSign = true;
         } else if (modes[i] == '-') {
@@ -36,17 +29,21 @@ std::vector<ModeChange> parseModes(const std::string& modes, std::queue<std::str
 
 std::string getAllModes(Channel *channel) {
     std::string modes;
+
     if (channel->getInviteOnly()) {
         modes += "i";
     }
-    if (channel->getTopicRestriction()) {
-        modes += "t";
+    if (channel->getAuth()) {
+        modes += "k";
     }
     if (channel->getUserLimit()) {
         modes += "l";
     }
-    if (channel->getAuth()) {
-        modes += "k";
+    if (channel->getTopicRestriction()) {
+        modes += "t";
+    }
+    if (modes.length() > 0) {
+        modes.insert(0, "+");
     }
     return modes;
 }
@@ -82,11 +79,11 @@ void Server::handleMode(int fd, std::string &input, Client &client) {
     for (size_t i = 3; i < tokens.size(); ++i)
         args.push(tokens[i]);
 
-    std::vector<ModeChange> modeChanges = parseModes(modes, args);
+    std::vector<ModeChange> modeChanges = parseModes(tokens[2], args);
 
     for (size_t i = 0; i < modeChanges.size(); ++i) {
         if (modeChanges[i].mode == 'i') {
-            channel->setTopicRestriction(modeChanges[i].add);
+            channel->setInviteOnly(modeChanges[i].add);
         } else if (modeChanges[i].mode == 't') {
             channel->setTopicRestriction(modeChanges[i].add);
         } else if (modeChanges[i].mode == 'l' && !modeChanges[i].argument.empty()) {
