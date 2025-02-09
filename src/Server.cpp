@@ -107,6 +107,8 @@ bool Server::accept_cl()
     newPoll.revents = 0;
     _pollFds.push_back(newPoll);
     _clients[clientFd] = Client(clientFd);
+    // here bot initialistaion 
+    // logic 
     _clients[clientFd].setIpAddress(inet_ntoa(clientAddr.sin_addr));
     std::cout << "New client connected: " << clientFd << std::endl;
     return true ;

@@ -10,6 +10,8 @@ std::string Server::getMsg(std::vector<std::string> &tokens) {
 
 void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
 
+    // input
+
     std::vector<std::string> tokens;
 
     tokens = Server::split(input, std::string("\t "));

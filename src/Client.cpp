@@ -1,9 +1,9 @@
 #include "../include/Client.hpp"
 
 // Constructor
-Client::Client() : _fd(-1), _registered(false), _nickName(""), _userName(""), _hostName(""), _buffer("") {}
+Client::Client() : _fd(-1), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("")  {}
 
-Client::Client(int fd) : _fd(fd), _registered(false), _nickName(""), _userName(""), _hostName(""), _buffer("") {}
+Client::Client(int fd) : _fd(fd), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("") {}
 
 // Destructor
 Client::~Client() {}
@@ -86,6 +86,17 @@ void Client::setIpAddress(const std::string& ipAddress) {
 
 void Client::setBuffer(const std::string& buffer) {
     _buffer += buffer;
+}
+void Client::setStart() {
+    _start = clock();
+}
+void Client::addLevel() {
+    _level++;
+    if (_level == 5)
+        _level = 1;
+}
+int Client::getLevel() const {
+   return _level;
 }
 
 
