@@ -22,7 +22,11 @@
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
-
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <queue>
+#include <map>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -56,7 +60,7 @@ class Server {
 
 	public:
 		Server(char** av);
-		void accept_cl();
+		bool accept_cl();
 		void receive(size_t & i);
 		void						setup();
 		void						serverSocket();
