@@ -14,6 +14,10 @@ std::string Channel::getName() const {
     return _name;
 }
 
+bool Channel::getlimit() const {
+    return _userLimit;
+}
+
 std::string Channel::getTopic() const {
     return _topic;
 }
@@ -24,12 +28,45 @@ bool Channel::getInviteOnly() const {
 std::string Channel::getPassword() const {
     return _password;
 }
+
+bool Channel::getUserLimit() const {
+    return _userLimit;
+}
+
 bool Channel::getTopicRestriction() const {
     return _topicRestriction;
 }
 
 time_t Channel::getTopicTime() const {
     return _topicTime;
+}
+int Channel::getclientsnumber() const {
+    return _members.size(); //check operator
+}
+
+
+bool Channel::getAuth() const {
+    return _auth;
+}
+
+int Channel::getLimit() const {
+    return _limit;
+}
+
+void Channel::setUserLimit(bool userLimit) {
+    _userLimit = userLimit;
+}
+
+void Channel::setInviteOnly(bool inviteOnly) {
+    _inviteOnly = inviteOnly;
+}
+
+void Channel::setLimit(int limit) {
+    _limit = limit;
+}
+
+void Channel::setAuth(bool auth) {
+    _auth = auth;
 }
 
 void Channel::setTopicRestriction(bool topicRestriction) {
@@ -86,7 +123,7 @@ bool Channel::isMember(Client *client) const {
 
 bool Channel::isOperator(Client *client) const {
     for (size_t i = 0; i < _operators.size(); ++i) {
-        if (&_operators[i] == client) {
+        if (_operators[i].getNickName() == client->getNickName()) {
             return true;
         }
     }
@@ -120,3 +157,22 @@ void Channel::broadcast(const std::string &message, Client *sender) const {
     }
 }
 
+std::string Channel::ChannelsclientList() {
+    std::string list;
+    std::set<std::string> seen;
+    for (size_t i = 0; i < _members.size(); ++i) {
+        std::string nickname = _members[i].getNickName();
+        // Avoid duplicate entries
+        if (seen.find(nickname) != seen.end())
+            continue;
+        seen.insert(nickname);
+        if (!list.empty()) 
+            list += " ";
+        if (isOperator(&_members[i])) {  
+            list += "@" + nickname;
+        } else {
+            list += nickname;
+        }
+    }
+    return list;
+}

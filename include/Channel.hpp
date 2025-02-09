@@ -15,6 +15,8 @@ class Channel {
         bool _inviteOnly;
         bool _topicRestriction;
         bool _userLimit;
+        bool _auth;
+        int _limit;
         std::map<char, bool> _modes;
         std::string _name;
         std::string _topic;
@@ -31,14 +33,23 @@ class Channel {
 
         std::string getName() const;
         std::string getTopic() const;
+
+        bool getlimit() const;
         bool getTopicRestriction() const;
         bool getInviteOnly() const;
+        bool getUserLimit() const;
+        bool getAuth() const;
+        int getLimit() const;
         std::string getPassword() const;
         
-        void setPassword(const std::string &password);
         bool getMode(char mode) const;
+        void setInviteOnly(bool inviteOnly);
+        void setAuth(bool auth);
+        void setLimit(int limit);
+        void setUserLimit(bool userLimit);
         time_t getTopicTime() const;
-
+        int getclientsnumber() const;
+        void setPassword(const std::string &password);
         void setTopicRestriction(bool topicRestriction);
         void setname(const std::string &name);
 
@@ -58,4 +69,5 @@ class Channel {
         bool hasMode(char mode) const;
 
         void broadcast(const std::string &message, Client *sender) const;
+        std::string ChannelsclientList();
 };

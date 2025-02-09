@@ -70,10 +70,10 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
         {
             Channel *new_channel = new Channel(_channel_name);
             new_channel->setname(_channel_name);
-            new_channel->isOperator(&client);
-            _channels.push_back(new_channel);
-            new_channel->addMember(&client);
-            channel = new_channel;
+            new_channel->addOperator(&client);
+            _channels.push_back(new_channel);//add channel to server
+            new_channel->addMember(&client);//add member to channel
+            channel = new_channel;//set channel to new channel
             std::cout << "channel created" <<  new_channel->getName() << std::endl;
         }
         else
@@ -85,9 +85,9 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
             }
             if (channel->getInviteOnly())
             {
-                if(!channel->isInvited(&client, channel_name, 1))
+                if(!channel->isInvited(&client, _channel_name, 1))
                 {
-                    sendResponse(fd, ERR_INVITEONLYCHAN(client.getNickName(), channel_name));
+                    sendResponse(fd, ERR_INVITEONLYCHAN(client.getNickName(), _channel_name));
                     continue ;
                 }
             }
@@ -95,13 +95,28 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
             std::cout << "password: " << password << std::endl;
             if (!channel->getPassword().empty() && channel->getPassword() != password)
             {
-                if (!channel->isInvited(&client, channel_name, 0))
+                if (!channel->isInvited(&client, _channel_name, 0))
                 {
                     sendResponse(fd, ERR_PASSMISMATCH(client.getNickName()));
                     continue ;
                 }
             }
-            channel->addMember(&client);
+            if (channel->getlimit() && (channel->getlimit() <= channel->getclientsnumber()))
+            {
+                sendResponse(fd, ERR_CHANNELISFULL(client.getNickName(), _channel_name));
+                continue ;
+            }
+            channel->addMember(&client);//add member to channel
         }
+        std::string joinreply = RPL_JOINMSG(client.getHostName(), client.getIpAddress(), _channel_name);
+        if (!channel->getTopic().empty()) {
+            std::string topicreply = ": 332 " + client.getNickName() + " #" + _channel_name + " :" + channel->getTopic() + "\r\n";
+            sendResponse(fd, topicreply);
+            joinreply += topicreply;
+        }
+        std::string namereply = RPL_NAMREPLY(client.getNickName(), _channel_name, channel->ChannelsclientList());
+        std::string endofnames = RPL_ENDOFNAMES(client.getNickName(), _channel_name);
+        sendResponse(fd, joinreply + namereply + endofnames);
+        channel->broadcast(RPL_JOINMSG(client.getHostName(), client.getIpAddress(), _channel_name), &client);
     }
 }
