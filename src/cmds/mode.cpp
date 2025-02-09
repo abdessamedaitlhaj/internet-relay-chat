@@ -71,8 +71,9 @@ void Server::handleMode(int fd, std::string &input, Client &client) {
     }
     if (tokens.size() == 2 && channel) {
         modes = getAllModes(channel);
-        sendResponse(fd, RPL_CHANNELMODEIS(client.getNickName(), client.getNickName(), modes));
-        sendResponse(fd, RPL_CREATIONTIME(client.getNickName(), client.getNickName(), std::to_string(channel->getTopicTime())));
+        sendResponse(fd, RPL_CHANNELMODEIS(client.getNickName(), channelName, modes));
+        sendResponse(fd, RPL_CREATIONTIME(client.getNickName(), channelName, std::to_string(time(NULL))));
+        return ;
     }
     if (!channel->isOperator(&client)) {
         sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channelName));
@@ -88,18 +89,18 @@ void Server::handleMode(int fd, std::string &input, Client &client) {
             channel->setTopicRestriction(modeChanges[i].add);
         } else if (modeChanges[i].mode == 't') {
             channel->setTopicRestriction(modeChanges[i].add);
-        } else if (modeChanges[i].mode == 'l') {
-            // is int arg
-            if () {
-                channel->setUserLimit(std::stoi(modeChanges[i].argument));
-            }
+        } else if (modeChanges[i].mode == 'l' && !modeChanges[i].argument.empty()) {
+            if (modeChanges[i].argument.find_first_not_of("0123456789") == std::string::npos && modeChanges[i].argument.find("-") == std::string::npos) {
+                channel->setLimit(std::stoi(modeChanges[i].argument));
+            } else
+                continue ;
             channel->setUserLimit(modeChanges[i].add);
-        } else if (modeChanges[i].mode == 'k') {
+        } else if (modeChanges[i].mode == 'k' && !modeChanges[i].argument.empty()) {
             channel->setAuth(modeChanges[i].add);
             if (modeChanges[i].add) {
                 channel->setPassword(modeChanges[i].argument);
             }
-        } else if (modeChanges[i].mode == 'o') {
+        } else if (modeChanges[i].mode == 'o' && !modeChanges[i].argument.empty()) {
             Client *op = getClientNick(modeChanges[i].argument);
             if (op) {
                 if (modeChanges[i].add) {
@@ -109,5 +110,7 @@ void Server::handleMode(int fd, std::string &input, Client &client) {
                 }
             }
         }
+        std::string response = ":" + client.getHostName() + client.getIpAddress() + " MODE " + channelName + " " + getAllModes(channel);
+
     }
 }

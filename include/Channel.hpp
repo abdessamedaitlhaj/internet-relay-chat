@@ -45,6 +45,7 @@ class Channel {
         void setInviteOnly(bool inviteOnly);
         void setAuth(bool auth);
         void setLimit(int limit);
+        void setUserLimit(bool userLimit);
         time_t getTopicTime() const;
 
         void setTopicRestriction(bool topicRestriction);

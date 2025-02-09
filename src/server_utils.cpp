@@ -83,8 +83,8 @@ void Server::parseCommand(int fd, std::string input) {
             handleTopic(fd, input, *client);
         else if (command == "PRIVMSG")
             handlePrivmsg(fd, input, *client);
-        // else if (command == "MODE")
-        //     handleMode(fd, input, *client);
+        else if (command == "MODE")
+            handleMode(fd, input, *client);
         else if (command == "JOIN")
             handleJoin(fd, input, *client);
         else

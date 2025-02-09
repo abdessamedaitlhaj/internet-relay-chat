@@ -24,6 +24,11 @@ bool Channel::getInviteOnly() const {
 std::string Channel::getPassword() const {
     return _password;
 }
+
+bool Channel::getUserLimit() const {
+    return _userLimit;
+}
+
 bool Channel::getTopicRestriction() const {
     return _topicRestriction;
 }
@@ -32,9 +37,6 @@ time_t Channel::getTopicTime() const {
     return _topicTime;
 }
 
-bool Channel::getUserLimit() const {
-    return _userLimit;
-}
 
 bool Channel::getAuth() const {
     return _auth;
@@ -42,6 +44,10 @@ bool Channel::getAuth() const {
 
 int Channel::getLimit() const {
     return _limit;
+}
+
+void Channel::setUserLimit(bool userLimit) {
+    _userLimit = userLimit;
 }
 
 void Channel::setInviteOnly(bool inviteOnly) {
