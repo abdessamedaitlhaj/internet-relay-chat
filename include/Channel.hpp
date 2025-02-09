@@ -31,14 +31,16 @@ class Channel {
 
         std::string getName() const;
         std::string getTopic() const;
+
+        bool getlimit() const;
         bool getTopicRestriction() const;
         bool getInviteOnly() const;
         std::string getPassword() const;
         
-        void setPassword(const std::string &password);
         bool getMode(char mode) const;
         time_t getTopicTime() const;
-
+        int getclientsnumber() const;
+        void setPassword(const std::string &password);
         void setTopicRestriction(bool topicRestriction);
         void setname(const std::string &name);
 
@@ -58,4 +60,5 @@ class Channel {
         bool hasMode(char mode) const;
 
         void broadcast(const std::string &message, Client *sender) const;
+        std::string ChannelsclientList();
 };

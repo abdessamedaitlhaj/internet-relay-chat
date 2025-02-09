@@ -22,3 +22,7 @@
 #define ERR_CHANOPRIVSNEEDED(nickName, channelName) ": 482 " + nickName + " #" + channelName + " :You're not channel operator" + CRLF
 #define RPL_TOPICWHOTIME(nickName, channelName, who, time) ":@localhost 333 " + nickName + " #" + channelName + " " + who + " " + time + CRLF
 #define ERR_NOSUCHSERVER(nickName, serverName) ": 402 " + nickName + " " + serverName + " :No such server" + CRLF
+#define ERR_CHANNELISFULL(nickName, channelName) ": 471 " + nickName + " #" + channelName + " :Cannot join channel (+l)" + CRLF
+#define RPL_JOINMSG(hostname, ipaddress, channelname) (":" + hostname + ipaddress + " JOIN #" + channelname + CRLF)
+#define RPL_NAMREPLY(nickname, channelname, clientslist) (": 353 " + nickname + " @ #" + channelname + " :" + clientslist + CRLF)
+#define RPL_ENDOFNAMES(nickname, channelname) (": 366 " + nickname + " #" + channelname + " :END of /NAMES list" + CRLF)

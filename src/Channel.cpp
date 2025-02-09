@@ -14,6 +14,10 @@ std::string Channel::getName() const {
     return _name;
 }
 
+bool Channel::getlimit() const {
+    return _userLimit;
+}
+
 std::string Channel::getTopic() const {
     return _topic;
 }
@@ -30,6 +34,9 @@ bool Channel::getTopicRestriction() const {
 
 time_t Channel::getTopicTime() const {
     return _topicTime;
+}
+int Channel::getclientsnumber() const {
+    return _members.size(); //check operator
 }
 
 void Channel::setTopicRestriction(bool topicRestriction) {
@@ -86,7 +93,7 @@ bool Channel::isMember(Client *client) const {
 
 bool Channel::isOperator(Client *client) const {
     for (size_t i = 0; i < _operators.size(); ++i) {
-        if (&_operators[i] == client) {
+        if (_operators[i].getNickName() == client->getNickName()) {
             return true;
         }
     }
@@ -120,3 +127,22 @@ void Channel::broadcast(const std::string &message, Client *sender) const {
     }
 }
 
+std::string Channel::ChannelsclientList() {
+    std::string list;
+    std::set<std::string> seen;
+    for (size_t i = 0; i < _members.size(); ++i) {
+        std::string nickname = _members[i].getNickName();
+        // Avoid duplicate entries
+        if (seen.find(nickname) != seen.end())
+            continue;
+        seen.insert(nickname);
+        if (!list.empty()) 
+            list += " ";
+        if (isOperator(&_members[i])) {  
+            list += "@" + nickname;
+        } else {
+            list += nickname;
+        }
+    }
+    return list;
+}
