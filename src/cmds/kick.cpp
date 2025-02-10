@@ -24,7 +24,7 @@ void Server::handleKick(int fd, std::string &input, Client& client)
     else
         reason = "kicked";
     // validate channel name
-    if (channelname.empty() || (channelname[0] != '#' && channelname[0] != '&'))
+    if (channelname.empty() || channelname[0] != '#' )
     {
         sendResponse(fd, ERR_BADCHANMASK(channelname));
         return ;

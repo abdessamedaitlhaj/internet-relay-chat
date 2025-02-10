@@ -53,7 +53,7 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
     {
         std::string channel_name = pairs_channels[i].first;
         std::string password = pairs_channels[i].second;
-        if (channel_name[0] != '#' && channel_name[0] != '&')
+        if (channel_name.empty() || channel_name[0] != '#')
         {
             sendResponse(fd, ERR_NOSUCHCHANNEL(client.getNickName(), channel_name));
             continue ;
