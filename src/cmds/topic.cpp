@@ -46,6 +46,10 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_NOSUCHCHANNEL(client.getNickName(), channelName));
         return;
     }
+    if (!channel->isMember(&client)) {
+        sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), channelName));
+        return;
+    }
     if (tokens.size() == 2 && !clear && trailing.empty()) {
         if (channel->getTopic().empty()) {
             sendResponse(fd, RPL_NOTOPIC(client.getNickName(), client.getHostName(), channelName));
@@ -54,11 +58,7 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
         }
         return;
     }
-    if (!channel->isMember(&client)) {
-        sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), channelName));
-        return;
-    }
-    if (channel->hasMode('t') && !channel->isOperator(&client)) {
+    if (channel->getTopicRestriction() && !channel->isOperator(&client)) {
         sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channelName));
         return;
     }

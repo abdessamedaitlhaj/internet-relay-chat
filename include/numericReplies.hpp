@@ -1,12 +1,12 @@
 #pragma once
 #define CRLF "\r\n"
 
-#define ERR_NOTREGISTERED(nickName) "451 " + nickName + " :You have not registered" + CRLF
+#define ERR_NOTREGISTERED(nickName) ": 451 " + nickName + " :You have not registered" + CRLF
 #define ERR_UNKNOWNCOMMAND(nickName, command) ": 421 " + nickName + " " + command + " :Unknown command" + CRLF
 #define ERR_NEEDMOREPARAMS(nickName, command) ": 461 " + nickName + " " + command + " :Not enough parameters" + CRLF
-#define ERR_ALREADYREGISTERED(nickName) "462 " + nickName + " :You may not reregister" + CRLF
-#define ERR_PASSMISMATCH(nickName) "464 " + nickName + " :Password incorrect" + CRLF
-#define ERR_NICKNAMEINUSE(nickName) "433 " + nickName + " :Nickname is already in use" + CRLF
+#define ERR_ALREADYREGISTERED(nickName) ": 462 " + nickName + " :You may not reregister" + CRLF
+#define ERR_PASSMISMATCH(nickName) ": 464 " + nickName + " :Password incorrect" + CRLF
+#define ERR_NICKNAMEINUSE(nickName) ": 433 " + nickName + " :Nickname is already in use" + CRLF
 #define ERR_ERRONEUSNICKNAME(nickName) "432 " + nickName + " :Erroneous nickname" + CRLF
 #define ERR_NOTONCHANNEL(nickName, channelName) ": 442 " + nickName + " " + channelName + " :You're not on that channel" + CRLF
 #define ERR_NOSUCHCHANNEL(nickName, channelName) ": 403 " + nickName + " " + channelName + " :No such channel" + CRLF

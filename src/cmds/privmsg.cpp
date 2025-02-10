@@ -10,6 +10,8 @@ std::string Server::getMsg(std::vector<std::string> &tokens) {
 
 void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
 
+    // input
+
     std::vector<std::string> tokens;
 
     tokens = Server::split(input, std::string("\t "));
@@ -68,24 +70,13 @@ void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
             } else if (target.find_first_of("!") != std::string::npos) {
                 target = target.substr(0, target.find_first_of("!"));
             }
-            Client *cli;
-            if (userName.empty()) {
-            std::cout << "ch : " << targts[i] << std::endl;
-                cli = getClientNick(target);
+            Client *cli = getClientNick(target);
                 if (!cli) {
                     sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), target));
                     continue ;
                 }
-            }
-            else {
-                cli = getClientUserName(userName);
-                if (!cli) {
-                    sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), target));
-                    continue ;
-                }
-            }
             response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG " + target + " :" + trailing + CRLF;
             sendResponse(cli->getFd(), response);
         }
-        }
     }
+}

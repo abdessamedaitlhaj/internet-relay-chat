@@ -58,12 +58,12 @@ void Server::handleKick(int fd, std::string &input, Client& client)
             sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channel_name));
             return ;
         }
-        std::string response = ":" + client.getNickName() + " KICK " + channelname + " " + nickname;
+        std::string response = ":" + client.getHostName() + client.getIpAddress() + " KICK " + channelname + " " + nickname;
         if (reason.empty())
             response += CRLF;
         else
             response += " :" + reason + CRLF;
-        channel->broadcast(response, &client);
+        channel->broadcastToAll(response);
         channel->removeMember(new_user);
     }
 }

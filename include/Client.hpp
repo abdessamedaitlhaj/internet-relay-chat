@@ -12,11 +12,13 @@ class Client {
     private:
         int _fd;
         bool _registered;
+        clock_t _start;
         std::string _password;
         std::string _nickName;
         std::string _userName;
         std::string _hostName;
         std::string _realName;
+        int _level;
         std::string _buffer;
         std::string _ipAddress;
         std::vector<Channel*> _channels;
@@ -36,9 +38,12 @@ class Client {
         std::string getRealName() const;
         std::string getIpAddress() const;
         std::string getBuffer() const;
+        int getLevel() const ;
 
+        void addLevel();
         void setFd(int fd);
         void setRegistered(bool registered);
+        void setStart();
         void setPassword(const std::string& password);
         void setNickName(const std::string& nickname);
         void setUserName(const std::string& username);

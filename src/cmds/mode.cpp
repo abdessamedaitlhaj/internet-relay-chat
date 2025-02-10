@@ -1,12 +1,5 @@
 #include "../..//include/Server.hpp"
 
-
-#include <iostream>
-#include <sstream>
-#include <vector>
-#include <queue>
-#include <map>
-
 struct ModeChange {
     char mode;
     bool add;
@@ -17,7 +10,7 @@ std::vector<ModeChange> parseModes(const std::string& modes, std::queue<std::str
     std::vector<ModeChange> changes;
     bool currentSign = true; // true for '+', false for '-'
 
-    for (size_t i = 0; i < modes.size(); ++i) {
+    for (size_t i = 0; i < modes.length(); ++i) {
         if (modes[i] == '+') {
             currentSign = true;
         } else if (modes[i] == '-') {
@@ -36,20 +29,65 @@ std::vector<ModeChange> parseModes(const std::string& modes, std::queue<std::str
 
 std::string getAllModes(Channel *channel) {
     std::string modes;
+    std::string params;
+
     if (channel->getInviteOnly()) {
         modes += "i";
+    }
+    if (channel->getAuth()) {
+        modes += "k";
+        params = channel->getPassword();
+    }
+    if (channel->getUserLimit()) {
+        modes += "l";
+        if (!params.empty())
+            params += " ";
+        params += std::to_string(channel->getLimit());
     }
     if (channel->getTopicRestriction()) {
         modes += "t";
     }
-    if (channel->getUserLimit()) {
-        modes += "l";
+    if (modes.length() > 0) {
+        modes.insert(0, "+");
     }
-    if (channel->getAuth()) {
-        modes += "k";
-    }
+    if (!params.empty())
+        modes.append(" " + params);
     return modes;
 }
+
+// std::string simplifyModes(std::vector<char> modes, std::vector<std::string> params) {
+//     std::map<char, std::vector<std::string>> modes;
+//     for (size_t i = 0; i < modes.size(); i++) {
+//         if (modes[i] == )
+//     }
+// }
+
+// std::string getAppliedModes(const std::vector<ModeChange>& modeChanges) {
+//     std::vector<char> modes;
+//     std::vector<std::string> params;
+//     std::string finalModes;
+//     for (size_t i = 0; i < modeChanges.size(); ++i) {
+//         if ((modeChanges[i].mode == 'o' && !modeChanges[i].argument.empty() && getClientNick(modeChanges[i].argument)) || \
+//         (modeChanges[i].mode == 'i') || (modeChanges[i].mode == 't') || \
+//         (modeChanges[i].mode == 'k' && !modeChanges[i].argument.empty()) || \
+//         (modeChanges[i].mode == 'l' && !modeChanges[i].argument.empty() && \
+//         modeChanges[i].argument.find_first_not_of("0123456789") == std::string::npos && \
+//          modeChanges[i].argument.find("-") == std::string::npos)) {
+//             if (modeChanges[i].add) {
+//                 modes.push_back('+');
+//                 params.push_back(modeChanges[i].argument);
+//             }
+//             else {
+//                  modes.push_back('-');
+//                  if (modeChanges[i].mode == 'k')
+//                     params.push_back(modeChanges[i].argument);
+//             }
+//             modes.push_back(modeChanges[i].mode);
+//         }
+//     }
+//     modes = simplifyModes(modes, params);
+//     return "";
+// }
 
 void Server::handleMode(int fd, std::string &input, Client &client) {
 
@@ -82,11 +120,11 @@ void Server::handleMode(int fd, std::string &input, Client &client) {
     for (size_t i = 3; i < tokens.size(); ++i)
         args.push(tokens[i]);
 
-    std::vector<ModeChange> modeChanges = parseModes(modes, args);
+    std::vector<ModeChange> modeChanges = parseModes(tokens[2], args);
 
     for (size_t i = 0; i < modeChanges.size(); ++i) {
         if (modeChanges[i].mode == 'i') {
-            channel->setTopicRestriction(modeChanges[i].add);
+            channel->setInviteOnly(modeChanges[i].add);
         } else if (modeChanges[i].mode == 't') {
             channel->setTopicRestriction(modeChanges[i].add);
         } else if (modeChanges[i].mode == 'l' && !modeChanges[i].argument.empty()) {
@@ -110,7 +148,8 @@ void Server::handleMode(int fd, std::string &input, Client &client) {
                 }
             }
         }
-        std::string response = ":" + client.getHostName() + client.getIpAddress() + " MODE " + channelName + " " + getAllModes(channel);
-
     }
+    // std::string appliedModes = getAppliedModes(channel);
+    std::string response = ":" + client.getHostName() + client.getIpAddress() + " MODE " + channelName + " " + getAllModes(channel) + CRLF;
+    channel->broadcastToAll(response);
 }
