@@ -93,6 +93,8 @@ class Server {
 		void						handlePrivmsg(int fd, std::string &input, Client& client);
 		void						handleJoin(int fd, std::string &input, Client& client);
 		void						handleMode(int fd, std::string &input, Client &client);
+		void						handleInvite(int fd, std::string &input, Client &client);
+		void						handleKick(int fd, std::string &input, Client &client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
 		std::string 				getMsg(std::vector<std::string> &tokens, int start);

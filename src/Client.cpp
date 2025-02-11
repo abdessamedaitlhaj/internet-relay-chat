@@ -119,3 +119,6 @@ void Client::removeChannelInvite(std::string &name) {
 void Client::addChannel(Channel* channel) {
     _channels.push_back(channel);
 }
+void Client::addInviteChannel(std::string &name) {
+    InviteChannels.push_back(name);
+}

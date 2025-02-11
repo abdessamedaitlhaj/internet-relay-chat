@@ -92,7 +92,7 @@ void Channel::addMember(Client *client) {
 
 void Channel::removeMember(Client *client) {
     for (size_t i = 0; i < _members.size(); ++i) {
-        if (&_members[i] == client) {
+        if (_members[i].getNickName() == client->getNickName()) {
             _members.erase(_members.begin() + i);
             return;
         }
