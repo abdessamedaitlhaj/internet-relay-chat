@@ -5,7 +5,6 @@ void Server::handleKick(int fd, std::string &input, Client& client)
     std::vector<std::string> tokens;
 
     tokens = Server::split(input, std::string("\t "));
-
     if (tokens.size() < 3)
     {
         sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));

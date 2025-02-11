@@ -49,7 +49,6 @@ void Server::handleNick(int fd, std::string &input, Client &client) {
     std::vector<std::string> tokens;
 
     tokens = Server::split(input, std::string("\t "));
-
     if (client.getPassword().empty()) {
         sendResponse(fd, ERR_NOTREGISTERED(std::string(std::string("*"))));
         return;

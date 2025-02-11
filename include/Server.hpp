@@ -45,7 +45,7 @@
 
 struct ModeChange {
     char mode;
-    bool add;
+    char sign;
     std::string argument;
 };
 
@@ -99,9 +99,7 @@ class Server {
 		void 						addChannel(Channel *channel);
 		std::string 				getMsg(std::vector<std::string> &tokens, int start);
 		
-
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
-
-		std::string getAppliedModes(std::vector<ModeChange>& modeChanges);
+		std::string getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
 };

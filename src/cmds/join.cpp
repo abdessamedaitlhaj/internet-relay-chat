@@ -3,11 +3,8 @@
 void Server::handleJoin(int fd, std::string &input, Client& client)
 {
     std::vector<std::string> tokens;
-
     tokens = Server::split(input, std::string("\t "));
 
-
-    //need more params
     if (tokens.size() < 2)
     {
         sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));

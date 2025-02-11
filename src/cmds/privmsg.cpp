@@ -10,12 +10,9 @@ std::string Server::getMsg(std::vector<std::string> &tokens, int start) {
 
 void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
 
-    // input
-
     std::vector<std::string> tokens;
 
     tokens = Server::split(input, std::string("\t "));
-
     if (tokens.size() == 1) {
         sendResponse(fd, ERR_NORECIPIENT(client.getNickName()));
         return;

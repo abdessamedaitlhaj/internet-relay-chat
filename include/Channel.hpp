@@ -39,8 +39,8 @@ class Channel {
         bool getInviteOnly() const;
         bool getUserLimit() const;
         bool getAuth() const;
-        int getLimit() const;
         std::string getPassword() const;
+        int getLimit() const;
         
         bool getMode(char mode) const;
         void setInviteOnly(bool inviteOnly);
