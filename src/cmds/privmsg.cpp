@@ -1,9 +1,9 @@
 #include "../../include/Server.hpp"
 
-std::string Server::getMsg(std::vector<std::string> &tokens) {
+std::string Server::getMsg(std::vector<std::string> &tokens, int start) {
     std::string msg;
-    for (size_t i = 2; i < tokens.size(); ++i) {
-        msg += tokens[i] + " ";
+    for (size_t i = start; i < tokens.size(); ++i) {
+        i == tokens.size() - 1 ? msg += tokens[i] : msg += tokens[i] + " ";
     }
     return msg;
 }
@@ -39,7 +39,9 @@ void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
                 continue ;
             }
             if (tokens.size() > 3) {
-                trailing = getMsg(tokens);
+                trailing = getMsg(tokens, 2);
+                size_t pos = trailing.find_first_of(":");
+                trailing = pos != std::string::npos ? trailing.substr(pos + 1) : trailing;
             }
             else {
                 last = tokens[2];

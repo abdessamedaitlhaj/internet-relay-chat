@@ -14,8 +14,8 @@ std::string Channel::getName() const {
     return _name;
 }
 
-bool Channel::getlimit() const {
-    return _userLimit;
+int Channel::getlimit() const {
+    return _limit;
 }
 
 std::string Channel::getTopic() const {
@@ -149,7 +149,7 @@ bool Channel::hasMode(char mode) const {
 
 void Channel::broadcast(const std::string &message, Client *sender) const {
     for (size_t i = 0; i < _members.size(); ++i) {
-        if (&_members[i] != sender) {
+        if (_members[i].getNickName() != sender->getNickName()) {
             if (send(_members[i].getFd(), message.c_str(), message.length(), 0) == -1) {
                 std::cerr << "Error: Failed to send message to client " << _members[i].getFd() << std::endl;
             }

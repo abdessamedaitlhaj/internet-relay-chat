@@ -89,8 +89,6 @@ void Server::parseCommand(int fd, std::string input) {
             handleMode(fd, input, *client);
         else if (command == "JOIN")
             handleJoin(fd, input, *client);
-        else if (command == "PART")
-            handlePart(fd, input, *client);
         else
             sendResponse(fd, ERR_UNKNOWNCOMMAND(client->getNickName(), command));
     } else

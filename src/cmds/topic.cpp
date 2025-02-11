@@ -55,6 +55,7 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
             sendResponse(fd, RPL_NOTOPIC(client.getNickName(), client.getHostName(), channelName));
         } else {
             sendResponse(fd, RPL_TOPIC(client.getNickName(), client.getHostName(), client.getIpAddress(), channelName, channel->getTopic()));
+            sendResponse(client.getFd(), RPL_TOPICWHOTIME(client.getNickName(), channelName, client.getNickName(), std::to_string(channel->getTopicTime())));
         }
         return;
     }
@@ -65,7 +66,7 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
     std::string last;
     size_t pos;
     if (tokens.size() > 3 && !clear) {
-        trailing = getMsg(tokens);
+        trailing = getMsg(tokens, 2);
     }
     else if (tokens.size() == 3 && !clear) {
         last = tokens[2];
@@ -74,6 +75,5 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
     }
     channel->setTopic(trailing);
     std::string response = ":" + client.getHostName() + client.getIpAddress() + " TOPIC #" + channelName + " :" + trailing + CRLF;
-    channel->broadcast(response, &client);
-    channel->broadcast(RPL_TOPICWHOTIME(client.getNickName(), channelName, client.getNickName(), std::to_string(channel->getTopicTime())), &client);
+    channel->broadcastToAll(response);
 }

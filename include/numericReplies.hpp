@@ -7,7 +7,7 @@
 #define ERR_ALREADYREGISTERED(nickName) ": 462 " + nickName + " :You may not reregister" + CRLF
 #define ERR_PASSMISMATCH(nickName) ": 464 " + nickName + " :Password incorrect" + CRLF
 #define ERR_NICKNAMEINUSE(nickName) ": 433 " + nickName + " :Nickname is already in use" + CRLF
-#define ERR_ERRONEUSNICKNAME(nickName) "432 " + nickName + " :Erroneous nickname" + CRLF
+#define ERR_ERRONEUSNICKNAME(nickName) ": 432 " + nickName + " :Erroneous nickname" + CRLF
 #define ERR_NOTONCHANNEL(nickName, channelName) ": 442 " + nickName + " #" + channelName + " :You're not on that channel" + CRLF
 #define ERR_NOSUCHCHANNEL(nickName, channelName) ": 403 " + nickName + " #" + channelName + " :No such channel" + CRLF
 #define ERR_NOSUCHNICK(nickName, recipient) ": 401 " + nickName + " " + recipient + " :No such nick/channel" + CRLF
@@ -16,18 +16,20 @@
 #define ERR_INVITEONLYCHAN(nickName, channelName) ": 473 " + nickName + " #" + channelName + " :Cannot join channel (+i)" + CRLF
 #define ERR_CHANOPRIVSNEEDED(nickName, channelName) ": 482 " + nickName + " #" + channelName + " :You're not channel operator" + CRLF
 #define ERR_NOSUCHSERVER(nickName, serverName) ": 402 " + nickName + " " + serverName + " :No such server" + CRLF
+#define ERR_NONICKNAMEGIVEN(nickName) ": 431 " + nickName + " :No nickname given" + CRLF
 
 
 #define RPL_WELCOME(nickName, userName, hostName, ip) ": 001 " + nickName + " :Welcome to the Internet Relay Network " + hostName + ip + CRLF
-#define RPL_NOTOPIC(nickName, hostName, channelName) ":@localhost 331 " + nickName + " #" + channelName + " :No topic is set" + CRLF
+#define RPL_NOTOPIC(nickName, hostName, channelName) ": 331 " + nickName + " #" + channelName + " :No topic is set" + CRLF
 #define RPL_TOPIC(nickName, hostName, ip, channelName, topic) ":" + hostName + ip + " " + nickName + " #" + channelName + " :" + topic + CRLF
-#define RPL_CHANNELMODEIS(nickName, channelName, modes) ":@localhost 324 " + nickName + " #" + channelName + " " + modes + CRLF
+#define RPL_CHANNELMODEIS(nickName, channelName, modes) ": 324 " + nickName + " #" + channelName + " " + modes + CRLF
 #define RPL_CREATIONTIME(nickName, channelName, time) ": 329 " + nickName + " #" + channelName + " " + time + CRLF
 #define ERR_CHANOPRIVSNEEDED(nickName, channelName) ": 482 " + nickName + " #" + channelName + " :You're not channel operator" + CRLF
-#define RPL_TOPICWHOTIME(nickName, channelName, who, time) ":@localhost 333 " + nickName + " #" + channelName + " " + who + " " + time + CRLF
+#define RPL_TOPICWHOTIME(nickName, channelName, who, time) ": 333 " + nickName + " #" + channelName + " " + who + " " + time + CRLF
 #define ERR_NOSUCHSERVER(nickName, serverName) ": 402 " + nickName + " " + serverName + " :No such server" + CRLF
 #define ERR_CHANNELISFULL(nickName, channelName) ": 471 " + nickName + " #" + channelName + " :Cannot join channel (+l)" + CRLF
 #define RPL_JOINMSG(hostname, ipaddress, channelname) (":" + hostname + ipaddress + " JOIN #" + channelname + CRLF)
 #define RPL_NAMREPLY(nickname, channelname, clientslist) (": 353 " + nickname + " @ #" + channelname + " :" + clientslist + CRLF)
 #define RPL_ENDOFNAMES(nickname, channelname) (": 366 " + nickname + " #" + channelname + " :END of /NAMES list" + CRLF)
-#define RPL_TOPICWHOTIME(nickName, channelName, who, time) ":@localhost 333 " + nickName + " #" + channelName + " " + who + " " + time + CRLF
+#define RPL_TOPICWHOTIME(nickName, channelName, who, time) ": 333 " + nickName + " #" + channelName + " " + who + " " + time + CRLF
+#define ERR_UNKNOWNMODE(nickName, mode) ": 472 " + nickName + " " + mode + " :is unknown mode char to me" + CRLF
