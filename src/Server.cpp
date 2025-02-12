@@ -260,7 +260,7 @@ void Server::botResponse(int fd, std::string &input, Client &client, std::vector
             double minutes = floor (time / 60);
             double seconds = fmod(time, 60.0) ;
             std::stringstream ss;
-            ss << LOGTIME <<  minutes << "   minutes " << seconds << "   seconds " << std::endl;
+            ss << LOGTIME <<  minutes << "   minute(s) " << seconds << "   seconds " << std::endl;
             sendResponse(fd, ss.str());
         }
         else 
