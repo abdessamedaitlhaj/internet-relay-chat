@@ -54,10 +54,20 @@ void Server::handleNick(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_NEEDMOREPARAMS(std::string("*"), tokens[0]));
         return;
     }
+
+    std::string requested_nick = tokens[1];
+
+    // if the nickname matches Bot
+    if (requested_nick == bot.getNickName()) {
+        sendResponse(fd, ERR_NICKNAMEINUSE(requested_nick));
+        return;
+    }
+
     if (!nickNameValid(tokens[1])) {
         sendResponse(fd, ERR_ERRONEUSNICKNAME(tokens[1]));
         return;
     }
+
     if (isNickNameInUse(tokens[1])) {
         sendResponse(fd, ERR_NICKNAMEINUSE(tokens[1]));
         return;

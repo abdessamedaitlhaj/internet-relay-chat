@@ -4,6 +4,8 @@
 #include "Channel.hpp"
 #include "numericReplies.hpp"
 
+#include "../bot/question.hpp"
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -54,12 +56,14 @@ class Server {
 		struct pollfd _poll;
 		std::string _password;
 		std::map<int, Client> _clients;
+		Client bot;
 		std::vector<struct pollfd> _pollFds;
 		std::vector<Channel*> _channels;
 		std::string _serverName;
 
 	public:
 		Server(char** av);
+		void	botResponse(int fd, std::string &input, Client &client, std::vector<std::string > tokens);
 		bool accept_cl();
 		void receive(size_t & i);
 		void						setup();

@@ -59,7 +59,6 @@ void Server::parseCommand(int fd, std::string input) {
     Client* client = getClient(fd);
     std::string command, params;
     std::vector<std::string> tokens;
-
     if (!client || input.empty())
         return;
     size_t pos = input.find_first_not_of("\t ");
@@ -71,7 +70,7 @@ void Server::parseCommand(int fd, std::string input) {
         command[i] = toupper(command[i]);
     }
 
-
+    //check here for bot authentification
     if (command == "PASS")
         handlePass(fd, input, *client);
     else if (command == "NICK")
@@ -79,8 +78,11 @@ void Server::parseCommand(int fd, std::string input) {
     else if (command == "USER")
         handleUser(fd, input, *client);
     else if (client->isRegistered()) {
+        if (!client->fix)
+        {
         client->setStart();
-        
+        client->fix = true ;
+        }
         if (command == "TOPIC")
             handleTopic(fd, input, *client);
         else if (command == "PRIVMSG")

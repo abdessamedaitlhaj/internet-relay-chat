@@ -24,6 +24,8 @@ void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
         return;
     }
 
+
+
     std::vector<std::string> targts = split(tokens[1], std::string(","));
     std::string target;
     std::string last;
@@ -32,7 +34,14 @@ void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
     std::string response;
     for (size_t i = 0; i < targts.size(); ++i) {
         target = targts[i];
-        if (target[0] == '#') {
+        if (target == "Bot")
+        {
+            std::string response = ":BotNick PRIVMSG " + client.getNickName() + " :Responding to " + client.getNickName() + "\r\n";
+            sendResponse(fd, response);
+            botResponse(fd, input , client , tokens);
+        }
+
+        else if (target[0] == '#') {
             std::string channelName = target.substr(1);
             if (!getChannel(channelName)) {
                 sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), "#" + channelName));
@@ -87,6 +96,7 @@ void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
                 }
             }
             response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG " + target + " :" + trailing + CRLF;
+            // this for response
             sendResponse(cli->getFd(), response);
         }
         }

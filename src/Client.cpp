@@ -3,7 +3,7 @@
 // Constructor
 Client::Client() : _fd(-1), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("")  {}
 
-Client::Client(int fd) : _fd(fd), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("") {}
+Client::Client(int fd) : _fd(fd), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("") , _started(false), fix(false){}
 
 // Destructor
 Client::~Client() {}
@@ -87,8 +87,16 @@ void Client::setIpAddress(const std::string& ipAddress) {
 void Client::setBuffer(const std::string& buffer) {
     _buffer += buffer;
 }
+
+void Client::setStarted(bool b) {
+    _started = b;
+}
+
+bool Client::getStarted() const {
+   return _started;
+}
 void Client::setStart() {
-    _start = clock();
+    start = clock();
 }
 void Client::addLevel() {
     _level++;
@@ -97,6 +105,9 @@ void Client::addLevel() {
 }
 int Client::getLevel() const {
    return _level;
+}
+void  Client::setLevel(int number)  {
+    _level = number;
 }
 
 

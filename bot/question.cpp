@@ -1,5 +1,5 @@
 #include "question.hpp"
-#include "pool.hpp"
+
 
 QuestionGame::QuestionGame()
 {
@@ -119,4 +119,37 @@ QuestionGame::Question &QuestionGame::getRandomQuestion(int level) {
     srand(time(0));
     int index = rand() % levels[level - 1].size();
     return levels[level - 1][index];
+}
+
+std::string QuestionGame::gameMessage(int flag)
+{
+    if (flag == MENU)
+        return MENU_MESSAGE;
+    
+    if (flag == END)
+        return END_MESSAGE;
+    
+    if (flag == WELCOME)
+        return WELCOME_MESSAGE;
+    
+    if (flag == LVL1)
+        return LVL1_MESSAGE;
+    
+    if (flag == LVL2)
+        return LVL2_MESSAGE;
+    
+    if (flag == LVL3)
+        return LVL3_MESSAGE;
+    
+    if (flag == LVL4)
+        return LVL4_MESSAGE;
+    
+	return (END_MESSAGE);
+}
+
+double QuestionGame::logtime (clock_t start)
+{
+	clock_t now = clock();
+	double time = static_cast<double>(now - start) / CLOCKS_PER_SEC;
+    return time;
 }
