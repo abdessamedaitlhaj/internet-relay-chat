@@ -1,6 +1,5 @@
 #include "../include/Server.hpp"
 
-// pass
 void Server::handlePass(int fd, std::string &input, Client &client) {
 
     std::vector<std::string> tokens;
@@ -9,6 +8,10 @@ void Server::handlePass(int fd, std::string &input, Client &client) {
 
     if (tokens.size() == 1) {
         sendResponse(fd, ERR_NEEDMOREPARAMS(std::string("*"), tokens[0]));
+        return;
+    }
+    if (!client.getPassword().empty()) {
+        sendResponse(fd, ERR_ALREADYREGISTERED(std::string("*")));
         return;
     }
     if (client.isRegistered()) {
@@ -22,7 +25,6 @@ void Server::handlePass(int fd, std::string &input, Client &client) {
     client.setPassword(tokens[1]);
 }
 
-// nickname
 bool Server::isNickNameInUse(const std::string& nickname) {
     for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
         if (it->second.getNickName() == nickname) {
@@ -32,10 +34,12 @@ bool Server::isNickNameInUse(const std::string& nickname) {
     return false;
 }
 
-bool nickNameValid(std::string &name) {
+bool isNickNameValid(std::string &name) {
 
+    if (isdigit(name[0]) || name.empty() || name[0] == '#' || name[0] == '&' || name[0] == ':')
+        return false;
     for (size_t i = 1; i < name.length(); ++i)
-        if (!std::isalnum(name[i]))
+        if (!std::isalnum(name[i]) && name[i] != '{' && name[i] != '}' && name[i] != '[' && name[i] != ']' && name[i] != '\\' && name[i] != '|')
             return false;
     return true;
 }
@@ -45,25 +49,15 @@ void Server::handleNick(int fd, std::string &input, Client &client) {
     std::vector<std::string> tokens;
 
     tokens = Server::split(input, std::string("\t "));
-
     if (client.getPassword().empty()) {
         sendResponse(fd, ERR_NOTREGISTERED(std::string(std::string("*"))));
         return;
     }
     if (tokens.size() == 1) {
-        sendResponse(fd, ERR_NEEDMOREPARAMS(std::string("*"), tokens[0]));
+        sendResponse(fd, ERR_NONICKNAMEGIVEN(std::string("*")));
         return;
     }
-
-    std::string requested_nick = tokens[1];
-
-    // if the nickname matches Bot
-    if (requested_nick == bot.getNickName()) {
-        sendResponse(fd, ERR_NICKNAMEINUSE(requested_nick));
-        return;
-    }
-
-    if (!nickNameValid(tokens[1])) {
+    if (!isNickNameValid(tokens[1])) {
         sendResponse(fd, ERR_ERRONEUSNICKNAME(tokens[1]));
         return;
     }
@@ -72,15 +66,24 @@ void Server::handleNick(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_NICKNAMEINUSE(tokens[1]));
         return;
     }
+    if (client.isRegistered()) {
+        std::string response = ":" + client.getHostName() + client.getIpAddress() + " NICK " + tokens[1] + CRLF;
+        client.setNickName(tokens[1]);
+        sendResponse(fd, response);
+        return;
+    }
+    if (!client.getNickName().empty()) {
+        sendResponse(fd, ERR_ALREADYREGISTERED(client.getNickName()));
+        return;
+    }
     client.setNickName(tokens[1]);
-    
+
     if (!client.getPassword().empty() && !client.getNickName().empty() && !client.getUserName().empty()) {
         client.setRegistered(true);
         sendResponse(fd, RPL_WELCOME(client.getNickName(), client.getUserName(), client.getHostName(), client.getIpAddress()));
     }
 }
 
-// username
 void Server::handleUser(int fd, std::string &input, Client &client) {
 
     std::vector<std::string> tokens;
@@ -91,15 +94,28 @@ void Server::handleUser(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_NOTREGISTERED(std::string(std::string("*"))));
         return;
     }
-    if (tokens.size() == 1) {
+    if (tokens.size() < 5 || tokens[4].empty()) {
         sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));
         return;
     }
-    std::string last = tokens[tokens.size() - 1];
-    size_t pos = last.find(":");
-    std::string trailing = pos != std::string::npos ? last.substr(pos + 1) : last;
+    if (!client.getUserName().empty()) {
+        sendResponse(fd, ERR_ALREADYREGISTERED(client.getNickName()));
+        return;
+    }
+    std::string last;
+    if (tokens.size() > 5) {
+        last = getMsg(tokens, 4);
+    } else if (tokens.size() == 5) {
+        last = tokens[4];
+    }
+    size_t pos = last.find_first_of(":");
+    std::string realName = pos != std::string::npos ? last.substr(pos + 1) : last;
+    if (realName.empty()) {
+        sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));
+        return;
+    }
     client.setUserName(tokens[1]);
-    client.setRealName(trailing);
+    client.setRealName(realName);
     if (!client.getPassword().empty() && !client.getNickName().empty() && !client.getUserName().empty()) {
         client.setRegistered(true);
         sendResponse(fd, RPL_WELCOME(client.getNickName(), client.getUserName(), client.getHostName(), client.getIpAddress()));

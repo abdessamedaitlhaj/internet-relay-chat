@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <sstream>
+#include <numeric>
 #include <algorithm>
 #include <ctime>
 #include <sstream>
@@ -43,6 +44,13 @@
 #define MAGENTA "\e[1;35m"
 #define CYAN    "\e[1;36m"
 #define WHITE   "\e[1;37m"
+
+struct ModeChange {
+    char mode;
+    char sign;
+    std::string argument;
+};
+
 
 class Client;
 
@@ -89,11 +97,14 @@ class Server {
 		void						handlePrivmsg(int fd, std::string &input, Client& client);
 		void						handleJoin(int fd, std::string &input, Client& client);
 		void						handleMode(int fd, std::string &input, Client &client);
+		void						handleInvite(int fd, std::string &input, Client &client);
+		void						handleKick(int fd, std::string &input, Client &client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
-		std::string 				getMsg(std::vector<std::string> &tokens);
+		std::string 				getMsg(std::vector<std::string> &tokens, int start);
 		
-
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
+		std::string getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
+		std::string applyModes(int fd, std::vector<ModeChange>& modeChanges, Channel &channel);
 };

@@ -1,21 +1,18 @@
 #include "../../include/Server.hpp"
 
-std::string Server::getMsg(std::vector<std::string> &tokens) {
+std::string Server::getMsg(std::vector<std::string> &tokens, int start) {
     std::string msg;
-    for (size_t i = 2; i < tokens.size(); ++i) {
-        msg += tokens[i] + " ";
+    for (size_t i = start; i < tokens.size(); ++i) {
+        i == tokens.size() - 1 ? msg += tokens[i] : msg += tokens[i] + " ";
     }
     return msg;
 }
 
 void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
 
-    // input
-
     std::vector<std::string> tokens;
 
     tokens = Server::split(input, std::string("\t "));
-
     if (tokens.size() == 1) {
         sendResponse(fd, ERR_NORECIPIENT(client.getNickName()));
         return;
@@ -48,7 +45,9 @@ void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
                 continue ;
             }
             if (tokens.size() > 3) {
-                trailing = getMsg(tokens);
+                trailing = getMsg(tokens, 2);
+                size_t pos = trailing.find_first_of(":");
+                trailing = pos != std::string::npos ? trailing.substr(pos + 1) : trailing;
             }
             else {
                 last = tokens[2];
@@ -79,25 +78,14 @@ void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
             } else if (target.find_first_of("!") != std::string::npos) {
                 target = target.substr(0, target.find_first_of("!"));
             }
-            Client *cli;
-            if (userName.empty()) {
-            std::cout << "ch : " << targts[i] << std::endl;
-                cli = getClientNick(target);
+            Client *cli = getClientNick(target);
                 if (!cli) {
                     sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), target));
                     continue ;
                 }
-            }
-            else {
-                cli = getClientUserName(userName);
-                if (!cli) {
-                    sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), target));
-                    continue ;
-                }
-            }
             response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG " + target + " :" + trailing + CRLF;
             // this for response
             sendResponse(cli->getFd(), response);
         }
-        }
     }
+}

@@ -59,4 +59,5 @@ class Client {
         void clearBuffer();
         void addChannel(Channel* channel);
         void removeChannelInvite(std::string& name);
+        void addInviteChannel(std::string& name);
 };

@@ -91,6 +91,10 @@ void Server::parseCommand(int fd, std::string input) {
             handleMode(fd, input, *client);
         else if (command == "JOIN")
             handleJoin(fd, input, *client);
+        else if (command == "INVITE")
+            handleInvite(fd, input, *client);
+        else if (command == "KICK")
+            handleKick(fd, input, *client);
         else
             sendResponse(fd, ERR_UNKNOWNCOMMAND(client->getNickName(), command));
     } else
