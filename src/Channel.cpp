@@ -1,10 +1,14 @@
 #include "../include/Channel.hpp"
                         
-
 Channel::Channel(const std::string &name) : _name(name) {
     _inviteOnly = false;
     _topicRestriction = false;
     _userLimit = false;
+    _limit = 0;
+    _auth = false;
+    _topicTime = 0;
+    _password = "";
+    
 
 }
 

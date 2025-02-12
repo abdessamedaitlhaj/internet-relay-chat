@@ -102,4 +102,5 @@ class Server {
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
 		std::string getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
+		std::string applyModes(int fd, std::vector<ModeChange>& modeChanges, Channel &channel);
 };

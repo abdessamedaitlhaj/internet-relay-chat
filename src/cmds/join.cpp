@@ -88,7 +88,9 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
                     continue ;
                 }
             }
-            if (channel->getlimit() && (channel->getlimit() < channel->getclientsnumber()))
+            std::cout << "channel limit : " << channel->getlimit() << std::endl;
+            std::cout << "channel clients number : " << channel->getclientsnumber() << std::endl;
+            if (channel->getlimit() && (channel->getlimit() <= channel->getclientsnumber()))
             {
                 sendResponse(fd, ERR_CHANNELISFULL(client.getNickName(), _channel_name));
                 continue ;
