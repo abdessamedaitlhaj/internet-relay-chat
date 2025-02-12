@@ -31,7 +31,7 @@ void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
     std::string response;
     for (size_t i = 0; i < targts.size(); ++i) {
         target = targts[i];
-        if (target == "Bot")
+        if (target == "bot")
         {
             std::string response = ":BotNick PRIVMSG " + client.getNickName() + " :Responding to " + client.getNickName() + "\r\n";
             sendResponse(fd, response);

@@ -3,7 +3,7 @@
 // Constructor
 Client::Client() : _fd(-1), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("")  {}
 
-Client::Client(int fd) : _fd(fd), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("") , _started(false), fix(false){}
+Client::Client(int fd) : _fd(fd), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("") , _started(false), fix(false), questionSent(false){}
 
 // Destructor
 Client::~Client() {}
@@ -96,7 +96,7 @@ bool Client::getStarted() const {
    return _started;
 }
 void Client::setStart() {
-    start = clock();
+    start_time = time(NULL);
 }
 void Client::addLevel() {
     _level++;

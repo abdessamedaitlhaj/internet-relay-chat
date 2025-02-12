@@ -40,7 +40,7 @@ Server::Server(char** av) {
     _port = parse_port(port);
     _password = parse_password(password);
 
-    bot.setNickName("Bot");
+    bot.setNickName("bot");
     bot.setUserName("bot");
     bot.setRealName("IRC Bot");
     bot.setRegistered(true);
@@ -220,10 +220,16 @@ void Server::botResponse(int fd, std::string &input, Client &client, std::vector
         QuestionGame::Question q = game.getRandomQuestion(client.getLevel());
         sendResponse(fd, q.problem);
         client.answer = q.correct ;
+        client.questionSent = true ;
     }
     else if (tokenGame)
     {
-        if (tokenGame && tokens[3].size() == 1 &&  tokens[3].at(0) == client.answer)
+        if (!client.questionSent)
+        {
+        sendResponse(fd, "You need to start the game first!\n");
+        return; // Stop execution here
+        }
+        if (client.questionSent &&  tokens[3].size() == 1 &&  tokens[3].at(0) == client.answer)
         {
             if (client.getLevel() == 1)
                 sendResponse(fd, LVL1_MESSAGE);
@@ -234,12 +240,14 @@ void Server::botResponse(int fd, std::string &input, Client &client, std::vector
             if (client.getLevel() == 4)
                 sendResponse(fd, LVL4_MESSAGE);
             client.addLevel();
+            client.questionSent = false ;
         }
         else 
         {
             sendResponse(fd, END_MESSAGE);
             client.setLevel(1);
             client.setStarted(false);
+            client.questionSent = false ;
         }
     }
     if (tokenLog)
@@ -248,11 +256,11 @@ void Server::botResponse(int fd, std::string &input, Client &client, std::vector
         find = this->getClientNick(tokens[3]);
         if (find)
         {
-            double time = game.logtime(find->start) * 1000;
-            double minutes = static_cast<int>(time / 60) ;
-            int seconds = (static_cast<int> (time) % 60) ;
+            double time = game.logtime(find->start_time);
+            double minutes = floor (time / 60);
+            double seconds = fmod(time, 60.0) ;
             std::stringstream ss;
-            ss << LOGTIME << time << "  minutes   "  << seconds << minutes  << "  seconds "<< std::endl;
+            ss << LOGTIME <<  minutes << "   minutes " << seconds << "   seconds " << std::endl;
             sendResponse(fd, ss.str());
         }
         else 
