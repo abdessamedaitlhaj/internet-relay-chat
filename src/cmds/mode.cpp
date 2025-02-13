@@ -1,51 +1,5 @@
 #include "../..//include/Server.hpp"
 
-// std::string Server::getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel) {
-//     std::vector<char> modes;
-//     std::string result;
-//     std::vector<std::string> params;
-//     std::string finalModes;
-//     for (size_t i = 0; i < modeChanges.size(); ++i) {
-//         if (modeChanges[i].mode == 'o' || modeChanges[i].mode == 'i' || modeChanges[i].mode == 't' || modeChanges[i].mode == 'k' || modeChanges[i].mode == 'l') {
-//             if (modeChanges[i].sign && modeChanges[i].sign == '+') {
-//                 modes.push_back('+');
-//                 if (!modeChanges[i].argument.empty() && (modeChanges[i].mode == 'k' || modeChanges[i].mode == 'l' || modeChanges[i].mode == 'o')) {
-//                     if (modeChanges[i].mode == 'l' && modeChanges[i].argument.find_first_not_of("0123456789") == std::string::npos && modeChanges[i].argument.find("-") == std::string::npos) {
-//                         modes.push_back('l');
-//                         params.push_back(modeChanges[i].argument);
-//                     }
-//                     else if (modeChanges[i].mode == 'o' && getClientNick(modeChanges[i].argument)) {
-//                         modes.push_back('o');
-//                         params.push_back(modeChanges[i].argument);
-//                     }
-//                     else if (modeChanges[i].mode == 'k') {
-//                         modes.push_back('k');
-//                         params.push_back(modeChanges[i].argument);
-//                     }
-//                 } else if (modeChanges[i].mode == 'i' || modeChanges[i].mode == 't') {
-//                     modes.push_back(modeChanges[i].mode);
-//                 }
-//             }
-//             else if (modeChanges[i].sign && modeChanges[i].sign == '-') {
-//                 modes.push_back('-');
-//                 if (modeChanges[i].mode == 'k' && !channel.getPassword().empty())
-//                     params.push_back("*");
-//                 std::string tmp = getAllModes(&channel);
-//                 std::cout << "tmp : " << tmp << std::endl;
-//                 std::vector<std::string> exitingModes = split(tmp, "\t ");
-//                 if (exitingModes.size() && exitingModes[0].find("itlok") != std::string::npos) 
-//                     modes.push_back(modeChanges[i].mode);
-//             }
-//         }
-//     }
-//     std::string modesToString(modes.begin(), modes.end());
-//     std::cout << "MODES TO STRING: " << modesToString << std::endl;
-//     result = reduceSignedString(modesToString);
-//     std::string paramsToString = accumulateStrings(params);
-//     result += " " + paramsToString;
-//     return result;
-// }
-
 std::vector<ModeChange> parseModes(const std::string& modes, std::queue<std::string>& args) {
     std::vector<ModeChange> changes;
     char sign = '\0';
@@ -57,7 +11,7 @@ std::vector<ModeChange> parseModes(const std::string& modes, std::queue<std::str
             sign = '-';
         } else {
             std::string arg;
-            if ((modes[i] == 'k' || modes[i] == 'l' || modes[i] == 'o') && !args.empty()) {
+            if ( !args.empty() && (modes[i] == 'k' || modes[i] == 'l' || modes[i] == 'o') && sign == '+') {
                 arg = args.front();
                 args.pop();
             }
@@ -95,145 +49,150 @@ std::string getAllModes(Channel *channel) {
     return modes;
 }
 
-std::string reduceSignedString(const std::string& input) {
-    if (input.empty()) return "";
-    
-    std::string result;
-    std::vector<char> currentChars;
-    char currentSign = 0;
-    
-    for (size_t i = 0; i < input.length(); i++) {
-        char c = input[i];
+std::string accumulateStrings(std::map<char, std::string> &params) {
 
-        if (c == '+' || c == '-') {
-            if (currentSign != 0 && c != currentSign) {
-                result += currentSign;
-                for (size_t j = 0; j < currentChars.size(); j++) {
-                    result += currentChars[j];
+    std::string result;
+    std::map<char, std::string>::iterator it = params.begin();
+
+    while (it != params.end()) {
+        result += it->second;
+        ++it;
+        if (it != params.end())
+            result += " ";
+    }
+    return result;
+}
+
+
+std::string Server::checkModes(int fd, ModeChange &modeChange, Channel &channel, std::map<char, std::string> &params) {
+
+    Client *client = getClient(fd);
+    std::string add;
+    std::string remove;
+    std::string channelName = channel.getName();
+
+    if (modeChange.mode == 'i' && modeChange.sign) {
+        if (!channel.getInviteOnly() && modeChange.sign == '+') {
+            channel.setInviteOnly(true);
+            add += "i";
+        }
+        if (channel.getInviteOnly() && modeChange.sign == '-') {
+            channel.setInviteOnly(false);
+            remove += "i";
+        }
+    } else if (modeChange.mode == 't' && modeChange.sign) {
+        if (!channel.getTopicRestriction() && modeChange.sign == '+') {
+            channel.setTopicRestriction(true);
+            add += "t";
+        }
+        if (channel.getTopicRestriction() && modeChange.sign == '-') {
+            channel.setTopicRestriction(false);
+            remove += "t";
+        }
+    }
+    else if (modeChange.sign && modeChange.mode == 'l') {
+        if (modeChange.sign == '+' && !modeChange.argument.empty() && \
+            modeChange.argument.find_first_not_of("0123456789") == std::string::npos && \
+            modeChange.argument.find("-") == std::string::npos) {
+            channel.setLimit(std::atoi(modeChange.argument.c_str()));
+            channel.setUserLimit(true);
+            add += "l";
+            params['l'] = modeChange.argument;
+        } else if (modeChange.sign == '-' && channel.getUserLimit()) {
+                channel.setUserLimit(false);
+                channel.setLimit(0);
+                remove += "l";
+        }
+    } else if (modeChange.sign && modeChange.mode == 'k') {
+        if (modeChange.sign == '+' && !modeChange.argument.empty()) {
+            channel.setAuth(true);
+            channel.setPassword(modeChange.argument);
+            add += "k";
+            params['k'] = modeChange.argument;
+        } else if (modeChange.sign == '-' && channel.getAuth()) {
+            channel.setAuth(false);
+            channel.setPassword("");
+            remove += "k";
+        }
+    } else if (modeChange.sign && modeChange.mode == 'o') {
+        if (!modeChange.argument.empty()) {
+            Client *op = getClientNick(modeChange.argument);
+            if (op && channel.isMember(op)) {
+                if (modeChange.sign == '+' && fd != op->getFd()) {
+                    channel.addOperator(op);
+                    add += "o";
+                    params['o'] = modeChange.argument;
+                } else {
+                    channel.removeOperator(op);
+                    remove += "o";
                 }
-                currentChars.clear();
             }
-            currentSign = c;
-        } else {
-            currentChars.push_back(c);
+            else {
+                if (op && !channel.isMember(op))
+                    sendResponse(fd, ERR_NOTONCHANNEL(client->getNickName(), channelName));
+                else
+                    sendResponse(fd, ERR_NOSUCHNICK(client->getNickName(), modeChange.argument));
+            }
         }
     }
-    if (!currentChars.empty()) {
-        result += currentSign;
-        for (size_t i = 0; i < currentChars.size(); i++) {
-            result += currentChars[i];
-        }
-    }
-    
-    return result;
+    std::sort(add.begin(), add.end());
+    std::sort(remove.begin(), remove.end());
+    if (!add.empty())0
+        add.insert(0, "+");
+    if (!remove.empty())
+        remove.insert(0, "-");
+    return add + remove;
 }
 
-std::string accumulateStrings(std::vector<std::string> params) {
-
+std::string reduce_mode(const std::string &mode) {
     std::string result;
+    bool plus_section = false, minus_section = false;
+    bool plus_seen[256] = {false};
+    bool minus_seen[256] = {false};
 
-    for (size_t i = 0; i < params.size(); ++i) {
-        if (i == 0) {
-            result += params[i];
+    for (std::size_t i = 0; i < mode.size(); ++i) {
+        char c = mode[i];
+
+        if (c == '+') {
+            if (!plus_section) result += c;
+            plus_section = true;
+            minus_section = false;
+        } else if (c == '-') {
+            if (!minus_section) result += c;
+            plus_section = false;
+            minus_section = true;
         } else {
-            result += " " + params[i];
+            if (plus_section && !plus_seen[(unsigned char)c]) {
+                result += c;
+                plus_seen[(unsigned char)c] = true;
+            }
+            if (minus_section && !minus_seen[(unsigned char)c]) {
+                result += c;
+                minus_seen[(unsigned char)c] = true;
+            }
         }
     }
     return result;
 }
-
 
 std::string Server::applyModes(int fd, std::vector<ModeChange>& modeChanges, Channel &channel) {
 
-    std::vector<char> modes;
-    std::vector<std::string> params;
+    std::string modes;
+    std::map<char, std::string> modeArgs;
     Client *client = getClient(fd);
 
     std::string channelName = channel.getName();
     for (size_t i = 0; i < modeChanges.size(); ++i) {
-            if (modeChanges[i].mode == 'i' && modeChanges[i].sign) {
-                if (!channel.getInviteOnly() && modeChanges[i].sign == '+') {
-                    channel.setInviteOnly(true);
-                    modes.push_back('+');
-                    modes.push_back('i');
-                }
-                if (channel.getInviteOnly() && modeChanges[i].sign == '-') {
-                    channel.setInviteOnly(false);
-                    modes.push_back('-');
-                    modes.push_back('i');
-                }
-            } else if (modeChanges[i].mode == 't' && modeChanges[i].sign) {
-                if (!channel.getTopicRestriction() && modeChanges[i].sign == '+') {
-                    channel.setTopicRestriction(true);
-                    modes.push_back('+');
-                    modes.push_back('t');
-                }
-                if (channel.getTopicRestriction() && modeChanges[i].sign == '-') {
-                    channel.setTopicRestriction(false);
-                    modes.push_back('-');
-                    modes.push_back('t');
-                }
-            } else if (modeChanges[i].sign && modeChanges[i].mode == 'l') {
-                if (modeChanges[i].sign == '+' && !modeChanges[i].argument.empty() && modeChanges[i].argument.find_first_not_of("0123456789") == std::string::npos && modeChanges[i].argument.find("-") == std::string::npos) {
-                    channel.setLimit(std::atoi(modeChanges[i].argument.c_str()));
-                    channel.setUserLimit(true);
-                    modes.push_back('+');
-                    modes.push_back('l');
-                    params.push_back(modeChanges[i].argument);
-                } else if (modeChanges[i].sign == '-' && channel.getUserLimit()) {
-                        channel.setUserLimit(false);
-                        channel.setLimit(0);
-                        modes.push_back('-');
-                        modes.push_back('l');
-                }
-            } else if (modeChanges[i].sign && modeChanges[i].mode == 'k') {
-                if (modeChanges[i].sign == '+' && !modeChanges[i].argument.empty()) {
-                    channel.setAuth(true);
-                    channel.setPassword(modeChanges[i].argument);
-                    modes.push_back('+');
-                    modes.push_back('k');
-                    params.push_back(modeChanges[i].argument);
-                } else if (modeChanges[i].sign == '-' && channel.getAuth()) {
-                    channel.setAuth(false);
-                    channel.setPassword("");
-                    modes.push_back('-');
-                    modes.push_back('k');
-                    params.push_back("*");
-                }
-            } else if (modeChanges[i].sign && modeChanges[i].mode == 'o') {
-                if (!modeChanges[i].argument.empty()) {
-                    Client *op = getClientNick(modeChanges[i].argument);
-                    if (op && channel.isMember(op)) {
-                        if (modeChanges[i].sign == '+' && fd != op->getFd()) {
-                            channel.addOperator(op);
-                            modes.push_back('+');
-                            modes.push_back('o');
-                            params.push_back(modeChanges[i].argument);
-                        } else {
-                            channel.removeOperator(op);
-                            modes.push_back('-');
-                            modes.push_back('o');
-                        }
-                    }
-                    else {
-                        if (op && !channel.isMember(op))
-                            sendResponse(fd, ERR_NOTONCHANNEL(client->getNickName(), channelName));
-                        else
-                            sendResponse(fd, ERR_NOSUCHNICK(client->getNickName(), modeChanges[i].argument));
-                    }
-                }
-            }
-            if (modeChanges[i].mode != 'o' && modeChanges[i].mode != 'l' && modeChanges[i].mode != 'k' && modeChanges[i].mode != 't' && modeChanges[i].mode != 'i') {
-                sendResponse(fd, ERR_UNKNOWNMODE(client->getNickName(), std::string(1, modeChanges[i].mode)));
-            }
-        }
-    std::string modesToString(modes.begin(), modes.end());
-    std::cout << "MODES TO STRING: " << modesToString << std::endl;
-    std::string appliedModes = reduceSignedString(modesToString);
-    std::string paramsToString = accumulateStrings(params);
+        modes += checkModes(fd, modeChanges[i], channel, modeArgs);
+        if (modeChanges[i].mode != 'o' && modeChanges[i].mode != 'l' && modeChanges[i].mode != 'k' && modeChanges[i].mode != 't' && modeChanges[i].mode != 'i')
+            sendResponse(fd, ERR_UNKNOWNMODE(client->getNickName(), std::string(1, modeChanges[i].mode)));
+    }
+
+    modes = reduce_mode(modes);
+    std::string paramsToString = accumulateStrings(modeArgs);
     if (!paramsToString.empty())
-        appliedModes += " " + paramsToString;
-    return appliedModes;
+        modes += " " + paramsToString;
+    return modes;
 }
 
 void Server::handleMode(int fd, std::string &input, Client &client) {
@@ -268,8 +227,19 @@ void Server::handleMode(int fd, std::string &input, Client &client) {
 
     std::vector<ModeChange> modeChanges = parseModes(tokens[2], args);
 
-    std::string appliedModes = applyModes(fd, modeChanges, *channel);
+    // print mode chnages
+    for (size_t i = 0; i < modeChanges.size(); ++i) {
+        std::cout << "Mode: " << modeChanges[i].mode << " Sign: " << modeChanges[i].sign << " Arg: " << modeChanges[i].argument << std::endl;
+    }
 
-    std::string response = ":" + client.getHostName() + client.getIpAddress() + " MODE #" + channelName + " " + appliedModes + CRLF;
-    channel->broadcastToAll(response);
+    std::string appliedModes = applyModes(fd, modeChanges, *channel);
+    std::string response;
+    if (appliedModes.empty()) {
+        response = ":" + client.getHostName() + client.getIpAddress() + " MODE #" + channelName + " " + getAllModes(channel) + CRLF;
+        sendResponse(fd, response);
+    }
+    else {
+        response = ":" + client.getHostName() + client.getIpAddress() + " MODE #" + channelName + " " + appliedModes + CRLF;
+        channel->broadcastToAll(response);
+    }
 }

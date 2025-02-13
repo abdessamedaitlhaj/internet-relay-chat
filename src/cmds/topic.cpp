@@ -55,14 +55,16 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
     }
     std::string last;
     size_t pos;
-    if (tokens.size() > 3) {
-        trailing = getMsg(tokens, 2);
-    }
-    else if (tokens.size() == 3) {
+    if (tokens.size() > 3)
+        last = tokens[2].find_first_of(":") != std::string::npos ? getMsg(tokens, 2) : tokens[2];
+    else if (tokens.size() == 3)
         last = tokens[2];
-        pos  = last.find_first_of(":");
-        trailing = pos != std::string::npos ? last.substr(pos + 1) : last;
-    }
+
+    pos  = last.find_first_of(":");
+    if (pos != std::string::npos)
+        trailing = last.substr(pos + 1);
+    else
+        trailing = last;
     channel->setTopic(trailing);
     std::string response = ":" + client.getHostName() + client.getIpAddress() + " TOPIC #" + channelName + " :" + trailing + CRLF;
     channel->broadcastToAll(response);

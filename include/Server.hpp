@@ -102,7 +102,8 @@ class Server {
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
 		std::string 				getMsg(std::vector<std::string> &tokens, int start);
-		
+		std::string 				checkModes(int fd, ModeChange &modeChange, Channel &channel, std::map<char, std::string> &params);
+
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
 		std::string getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
