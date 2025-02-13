@@ -1,5 +1,4 @@
 #pragma once
-
 #include <vector>
 #include <iostream>
 #include "pool.hpp"
@@ -20,6 +19,6 @@ class QuestionGame {
 		QuestionGame();
 		Question & getRandomQuestion(int level);
 		std::string  gameMessage(int flag);
-		double	logtime(clock_t start);
+		double	logtime(time_t start);
 
 };

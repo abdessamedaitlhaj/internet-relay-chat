@@ -24,9 +24,11 @@ class Client {
         std::vector<std::string> InviteChannels;
         bool _started;
     public:
-        clock_t start;
+        // clock_t start;
+        time_t start_time;
         char answer;
         bool fix;
+        bool questionSent;
 
         Client();
         Client(int fd);

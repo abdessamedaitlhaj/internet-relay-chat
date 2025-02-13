@@ -1,5 +1,5 @@
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98
-CPPFLAGS += -fsanitize=address
+CPPFLAGS += #-fsanitize=address
 SRC = main.cpp	src/Client.cpp src/Server.cpp src/auth.cpp src/Channel.cpp src/cmds/topic.cpp src/cmds/join.cpp src/server_utils.cpp src/cmds/privmsg.cpp src/cmds/mode.cpp src/cmds/invite.cpp src/cmds/kick.cpp
 OBJ = $(SRC:.cpp=.o)
 HEADER = include/Server.hpp include/Client.hpp include/Channel.hpp include/numericReplies.hpp

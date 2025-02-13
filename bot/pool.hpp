@@ -48,7 +48,17 @@
 
 #define MENU 1
 
-#define MENU_MESSAGE "HOW TO USE \n"
+#define MENU_MESSAGE "BOT MANUAL - MASTER THE COMMANDS\n\n" \
+                    "To interact with bot, use: privmsg bot <command>\n\n" \
+                    "Commands:\n" \
+                    "1. GAME - Play a quiz game.\n" \
+                    "   - Start: 'privmsg bot game start' to begin or get a new question.\n" \
+                    "   - Answer: Reply with a single character (a, b, c, d).\n" \
+                    "   - Correct answer → Level up.\n" \
+                    "   - Wrong answer → Reset to level 1.\n\n" \
+                    "2. LOGTIME - Check time elapsed since a user was last .\n" \
+                    "   - Use 'privmsg bot logtime <nickname>' to see how long ago a user was last .\n\n" \
+                    "Follow the format and have fun!\n"
 
 #define END 2
 
