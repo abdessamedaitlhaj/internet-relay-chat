@@ -1,14 +1,38 @@
 #include "../../include/Server.hpp"
 
-std::string Server::getMsg(std::vector<std::string> &tokens, int start) {
-    std::string msg;
-    for (size_t i = start; i < tokens.size(); ++i) {
-        i == tokens.size() - 1 ? msg += tokens[i] : msg += tokens[i] + " ";
+
+bool Server::isChannel(int fd, std::string &target, Client &client, std::string &trailing) {
+
+    if (target[0] == '#') {
+        std::string channelName = target.substr(1);
+        if (!getChannel(channelName)) {
+            sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), "#" + channelName));
+            return false;
+        }
+        Channel *channel = getChannel(channelName);
+        if (!channel->isMember(&client)) {
+            sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), channelName));
+            return false;
+        }
+        std::string response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG #" + channelName + " :" + trailing + CRLF;
+        channel->broadcast(response, &client);
     }
-    return msg;
+    return true;
 }
 
-void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
+bool Server::isClient(int fd, std::string &target, Client &client, std::string &trailing) {
+
+    Client *cli = getClientNick(target);
+    if (!cli) {
+        sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), target));
+        return false;
+    }
+    std::string response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG " + target + " :" + trailing + CRLF;
+    sendResponse(cli->getFd(), response);
+    return true;
+}
+
+void Server::handlePrivmsg(int fd, std::string &input, Client &client) {
 
     std::vector<std::string> tokens;
 
@@ -20,54 +44,16 @@ void    Server::handlePrivmsg(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_NOTEXTTOSEND(client.getNickName()));
         return;
     }
-
     std::vector<std::string> targts = split(tokens[1], std::string(","));
     std::string target;
     std::string trailing;
     std::string response;
     for (size_t i = 0; i < targts.size(); ++i) {
-        std::string last;
-        size_t pos;
-        if (tokens.size() > 3)
-            last = tokens[2].find_first_of(":") != std::string::npos ? getMsg(tokens, 2) : tokens[2];
-        else if (tokens.size() == 3)
-            last = tokens[2];
-
-        pos = last.find_first_of(":");
-        if (pos != std::string::npos)
-            trailing = last.substr(pos + 1);
-        else
-            trailing = last;
-        
+        trailing = getTrailing(tokens, trailing);
         target = targts[i];
-        if (target == "bot")
-        {
-            std::string res = ":BotNick PRIVMSG " + client.getNickName() + " :Responding to " + client.getNickName() + "\r\n";
-            sendResponse(fd, res);
-            botResponse(fd, input , client , tokens);
-        }
-        else if (target[0] == '#') {
-            std::string channelName = target.substr(1);
-            if (!getChannel(channelName)) {
-                sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), "#" + channelName));
-                continue ;
-            }
-            Channel *channel = getChannel(channelName);
-            if (!channel->isMember(&client)) {
-                sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), channelName));
-                continue ;
-            }
-            response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG #" + channelName + " :" + trailing + CRLF;
-            channel->broadcast(response, &client);
-        }
-        else {
-            Client *cli = getClientNick(target);
-            if (!cli) {
-                sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), target));
-                continue ;
-            }
-            response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG " + target + " :" + trailing + CRLF;
-            sendResponse(cli->getFd(), response);
-        }
+        if (!isChannel(fd, target, client, trailing))
+            return;
+        if (!isClient(fd, target, client, trailing))
+            return;
     }
 }

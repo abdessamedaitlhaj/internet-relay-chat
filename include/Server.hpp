@@ -107,6 +107,9 @@ class Server {
 
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
-		std::string getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
-		std::string applyModes(int fd, std::vector<ModeChange>& modeChanges, Channel &channel);
+		std::string					getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
+		std::string					applyModes(int fd, std::vector<ModeChange>& modeChanges, Channel &channel);
+		std::string					getTrailing(std::vector<std::string> &tokens, std::string &trailing);
+		bool						isChannel(int fd, std::string &target, Client &client, std::string &trailing);
+		bool						isClient(int fd, std::string &target, Client &client, std::string &trailing);
 };

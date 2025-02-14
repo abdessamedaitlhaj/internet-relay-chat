@@ -53,18 +53,7 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channelName));
         return;
     }
-    std::string last;
-    size_t pos;
-    if (tokens.size() > 3)
-        last = tokens[2].find_first_of(":") != std::string::npos ? getMsg(tokens, 2) : tokens[2];
-    else if (tokens.size() == 3)
-        last = tokens[2];
-
-    pos  = last.find_first_of(":");
-    if (pos != std::string::npos)
-        trailing = last.substr(pos + 1);
-    else
-        trailing = last;
+    trailing = getTrailing(tokens, trailing);
     channel->setTopic(trailing);
     std::string response = ":" + client.getHostName() + client.getIpAddress() + " TOPIC #" + channelName + " :" + trailing + CRLF;
     channel->broadcastToAll(response);

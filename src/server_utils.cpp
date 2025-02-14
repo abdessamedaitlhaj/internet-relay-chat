@@ -122,11 +122,27 @@ Client *Server::getClientNick(std::string &nick) {
     return (NULL);
 }
 
-Client *Server::getClientUserName(std::string &nick) {
+std::string Server::getTrailing(std::vector<std::string> &tokens, std::string &trailing) {
 
-    for (size_t i = 0; i < _clients.size(); i++) {
-        if (_clients[i].getUserName() == nick)
-            return (&_clients[i]);
+    std::string last;
+    size_t pos;
+    if (tokens.size() > 3)
+        last = tokens[2].find_first_of(":") != std::string::npos ? getMsg(tokens, 2) : tokens[2];
+    else if (tokens.size() == 3)
+        last = tokens[2];
+
+    pos = last.find_first_of(":");
+    if (pos != std::string::npos)
+        trailing = last.substr(pos + 1);
+    else
+        trailing = last;
+    return trailing;
+}
+
+std::string Server::getMsg(std::vector<std::string> &tokens, int start) {
+    std::string msg;
+    for (size_t i = start; i < tokens.size(); ++i) {
+        i == tokens.size() - 1 ? msg += tokens[i] : msg += tokens[i] + " ";
     }
-    return (NULL);
+    return msg;
 }
