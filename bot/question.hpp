@@ -10,6 +10,10 @@ class QuestionGame {
 		void  initializeLevel2();
 		void  initializeLevel3();
 		void  initializeLevel4();
+		int level;
+    	bool started;
+    	bool questionSent;
+    	char correctAnswer; 
 	public :
 		struct Question {
 			std::string problem;
@@ -19,6 +23,19 @@ class QuestionGame {
 		QuestionGame();
 		Question & getRandomQuestion(int level);
 		std::string  gameMessage(int flag);
-		double	logtime(time_t start);
+		int getLevel() const { return level; }
+    	bool getStarted() const { return started; }
+    	bool isQuestionSent() const { return questionSent; }
+    	char getAnswer() const { return correctAnswer; }
+
+    	void setLevel(int newLevel) { level = newLevel; }
+    	void setStarted(bool startedFlag) { started = startedFlag; }
+    	void setQuestionSent(bool flag) { questionSent = flag; }
+    	void setAnswer(char answer) { correctAnswer = answer; }
+    	void addLevel() {
+			level++; 
+			if (level == 5)
+				level = 1;
+		}
 
 };

@@ -57,11 +57,6 @@ void Server::handleNick(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_NONICKNAMEGIVEN(std::string("*")));
         return;
     }
-    if (!isNickNameValid(tokens[1]) || (tokens[1] == "bot")) {
-        sendResponse(fd, ERR_ERRONEUSNICKNAME(tokens[1]));
-        return;
-    }
-
     if (isNickNameInUse(tokens[1])) {
         sendResponse(fd, ERR_NICKNAMEINUSE(tokens[1]));
         return;

@@ -1,7 +1,7 @@
 #include "question.hpp"
 
 
-QuestionGame::QuestionGame()
+QuestionGame::QuestionGame() : level(1), started(false), questionSent(false), correctAnswer(' ')
 {
 		initializeLevel1();
 		initializeLevel2();
@@ -147,18 +147,3 @@ std::string QuestionGame::gameMessage(int flag)
 	return (END_MESSAGE);
 }
 
-// double QuestionGame::logtime (clock_t start)
-// {
-// 	clock_t now = clock();
-// 	double time = static_cast<double>(now - start) / CLOCKS_PER_SEC;
-//     return time;
-// }
-
-
-double QuestionGame::logtime(time_t start)
-{
-        time_t now = time(NULL);  // Get the current time
-        double time = difftime(now, start);  // Calculate the difference in seconds
-
-        return time;
-}

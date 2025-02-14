@@ -39,11 +39,6 @@ Server::Server(char** av) {
     std::string password(av[2]);
     _port = parse_port(port);
     _password = parse_password(password);
-
-    bot.setNickName("bot");
-    bot.setUserName("bot");
-    bot.setRealName("IRC Bot");
-    bot.setRegistered(true);
     std::cout << "pass  :" << _password << std::endl;
     std::cout << "port  :" << _port << std::endl;
 }
@@ -110,8 +105,6 @@ bool Server::accept_cl()
     newPoll.revents = 0;
     _pollFds.push_back(newPoll);
     _clients[clientFd] = Client(clientFd);
-    // here bot initialistaion 
-    // logic 
     _clients[clientFd].setIpAddress(inet_ntoa(clientAddr.sin_addr));
     std::cout << "New client connected: " << clientFd << std::endl;
     return true ;
@@ -166,11 +159,6 @@ void Server::setup() {
             }
         }
     }
-    // struct pollfd bot_poll;
-    // bot_poll.fd = bot.getFd(); // Use the bot's file descriptor
-    // bot_poll.events = POLLIN;  // Monitor for incoming data
-    // bot_poll.revents = 0;
-    // _pollFds.push_back(bot_poll);
 
 }
 
@@ -189,81 +177,4 @@ void Server::handleBuffer(int fd, std::string &buffer) {
     client->clearBuffer();
     return;
 }
-void Server::botResponse(int fd, std::string &input, Client &client, std::vector<std::string > tokens) {
-    (void)client;
-    (void)tokens;
-    (void)input;
 
-    std::string response = MENU_MESSAGE;
-    if (tokens.size() !=  4)
-        return(sendResponse(fd, response));
-    std::cout << tokens.size() <<std::endl;
-    bool tokenGame = ((tokens[2] == "game") && (tokens[3]== "start" || tokens[3]== "a"||  tokens[3]== "b" || tokens[3]== "c" || tokens[3]== "d"));
-    bool tokenLog = ((tokens[2] == "logtime") && !tokens[3].empty());
-
-    if ( !tokenGame && !tokenLog)
-        return(sendResponse(fd, response));
-    if (tokenGame && client.getLevel() == 1 && tokens[3] != "start" &&  client.getStarted() == false)
-        return(sendResponse(fd, STARTING_ERROR));
-    // start the game ;
-    if (tokenGame && client.getLevel() == 1 && client.getStarted() == false)
-    {
-        sendResponse(fd, WELCOME_MESSAGE);
-        sleep (1);
-        client.setStarted(true);
-    }
-    
-    QuestionGame game;
-    if (tokenGame && tokens[3] == "start")
-    {
-        QuestionGame::Question q = game.getRandomQuestion(client.getLevel());
-        sendResponse(fd, q.problem);
-        client.answer = q.correct ;
-        client.questionSent = true ;
-    }
-    else if (tokenGame)
-    {
-        if (!client.questionSent)
-        {
-        sendResponse(fd, "You need to start the game first!\n");
-        return; // Stop execution here
-        }
-        if (client.questionSent &&  tokens[3].size() == 1 &&  tokens[3].at(0) == client.answer)
-        {
-            if (client.getLevel() == 1)
-                sendResponse(fd, LVL1_MESSAGE);
-            if (client.getLevel() == 2)
-                sendResponse(fd, LVL2_MESSAGE);
-            if (client.getLevel() == 3)
-                sendResponse(fd, LVL3_MESSAGE);
-            if (client.getLevel() == 4)
-                sendResponse(fd, LVL4_MESSAGE);
-            client.addLevel();
-            client.questionSent = false ;
-        }
-        else 
-        {
-            sendResponse(fd, END_MESSAGE);
-            client.setLevel(1);
-            client.setStarted(false);
-            client.questionSent = false ;
-        }
-    }
-    if (tokenLog)
-    {
-        Client *find;
-        find = this->getClientNick(tokens[3]);
-        if (find)
-        {
-            double time = game.logtime(find->start_time);
-            double minutes = floor (time / 60);
-            double seconds = fmod(time, 60.0) ;
-            std::stringstream ss;
-            ss << LOGTIME <<  minutes << "   minute(s) " << seconds << "   seconds " << std::endl;
-            sendResponse(fd, ss.str());
-        }
-        else 
-            sendResponse(fd, NOT_FOUND);
-    }
-    //continue the game ;
-}
