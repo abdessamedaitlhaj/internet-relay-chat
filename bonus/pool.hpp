@@ -48,17 +48,15 @@
 
 #define MENU 1
 
-#define MENU_MESSAGE "BOT MANUAL - MASTER THE COMMANDS\n\n" \
-                    "To interact with bot, use: privmsg bot <command>\n\n" \
-                    "Commands:\n" \
-                    "1. GAME - Play a quiz game.\n" \
-                    "------Start: 'privmsg bot game start' to begin or get a new question.\n" \
-                    "----- Answer: Reply with a single character (a, b, c, d).\n" \
-                    "----- Correct answer → Level up.\n" \
+#define MENU_MESSAGE "BOT MANUAL - MASTER THE GAME COMMANDS\n\n" \
+                    "To play the quiz game, use the following commands:\n\n" \
+                    "1. START THE GAME:\n" \
+                    "------Use 'privmsg bot start' to begin or get a new question.\n\n" \
+                    "2. ANSWER THE QUESTION:\n" \
+                    "------Reply with a single character: 'a', 'b', 'c', or 'd'.\n" \
+                    "------Correct answer → Level up!\n" \
                     "------Wrong answer → Reset to level 1.\n\n" \
-                    "2. LOGTIME - Check time elapsed since a user was last .\n" \
-                    "------Use 'privmsg bot logtime <nickname>' to see how long ago a user was last .\n\n" \
-                    "Follow the format and have fun!\n"
+                    "Follow the format, stay sharp, and have fun!\n"
 
 #define END 2
 
@@ -132,6 +130,6 @@
 #define STARTING_ERROR "please start the game first , use game start!! \n"
 
 
-#define LOGTIME "logtime is    "
+
 
 #define NOT_FOUND "not found \n"

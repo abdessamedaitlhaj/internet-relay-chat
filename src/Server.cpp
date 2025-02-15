@@ -1,5 +1,14 @@
 #include "../include/Server.hpp"
 
+
+Server::~Server() {
+    close(_socket); // Close the main socket
+    // Close all client sockets
+    for (size_t i = 0; i < _pollFds.size(); ++i) {
+        close(_pollFds[i].fd);
+    }
+}
+
 std::string Server::parse_password(std::string password)
 {
 	if (!password.empty()  && std::isspace(password.at(0)) )
@@ -48,8 +57,9 @@ void Server::serverSocket()
     if(_socket == -1)
 		throw(std::runtime_error("socket creation failed"));
     //int option = 1;
-    int check = 0;
-    check = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &check, sizeof(check));
+    int check;
+    int reuse = 1;
+    check = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
     if (check == -1)
 		throw(std::runtime_error("setting option SO_REUSEADDR failed"));
 
@@ -163,6 +173,7 @@ void Server::handleBuffer(int fd, std::string &buffer) {
     Client *client = getClient(fd);
     std::vector<std::string> commands;
     client->setBuffer(buffer);
+    std::cout << client->getBuffer() << std::endl;
     if(client->getBuffer().find_first_of("\r\n") == std::string::npos)
         return;
     commands = parseData(client);

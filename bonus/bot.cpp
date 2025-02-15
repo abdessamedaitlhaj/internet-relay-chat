@@ -17,6 +17,11 @@ std::string Bot::parse_password(std::string password)
 {
 	if (!password.empty()  && std::isspace(password.at(0)) )
 		throw std::invalid_argument("Error: Password must not start with a whitespace character.");
+    for (size_t i = 0; i < password.length(); ++i) {
+        if (std::isspace(password[i]) || !std::isprint(password[i])) {
+            throw std::invalid_argument("Error: Password contains invalid characters.");
+        }
+    }
 	return(password);
 }
 
@@ -122,30 +127,33 @@ void Bot::game() {
 		memset(buff, 0, sizeof(buff));
 		ssize_t Bytenumber = recv(botsock, buff, sizeof(buff) - 1, 0);
 		if(Bytenumber < 1)
-        {
 			break;
-        }
-		std::string retrieved = buff;
-		size_t pos = retrieved.find_first_of("\n\r");
-		if(pos != std::string::npos)
-			retrieved = retrieved.substr(0, pos);
-		if(retrieved == ": 001 " + _nick + " :Welcome to the Internet Relay Network "+ _nick + "!~bot@127.0.0.1" && !_log)
-			_log = true;
-		else if (!_log){
-			std::cout << retrieved << std::endl;
-			std::cout << _log << std::endl;
-			return;
-		}
-		else if(retrieved.find("PRIVMSG") != std::string::npos && _log)
-		{
-            std::string sender_nick = extractNickname(retrieved);
-            std::cout << retrieved  << std::endl;
-            if(gameMap.find(sender_nick) == gameMap.end()) {
-                gameMap[sender_nick] = QuestionGame();  // Create new game object if it doesn't exist
-            }
+		_buffer.append(buff, Bytenumber);
+        size_t pos;
+        while ((pos = _buffer.find("\r\n")) != std::string::npos)
+        {
+            std::string retrieved = _buffer.substr(0, pos);
+            _buffer.erase(0, pos + 2);
+            if(pos != std::string::npos)
+			    retrieved = retrieved.substr(0, pos);
+		    if(retrieved == ": 001 " + _nick + " :Welcome to the Internet Relay Network "+ _nick + "!~bot@127.0.0.1" && !_log)
+			    _log = true;
+		    else if (!_log){
+			    std::cout << retrieved << std::endl;
+		    	std::cout << _log << std::endl;
+			    return;
+		    }
+		    else if(retrieved.find("PRIVMSG") != std::string::npos && _log)
+		    {
+               std::string sender_nick = extractNickname(retrieved);
+               std::cout << retrieved  << std::endl;
+               if(gameMap.find(sender_nick) == gameMap.end()) {
+                   gameMap[sender_nick] = QuestionGame();  // Create new game object if it doesn't exist
+               }
 
-            play(gameMap[sender_nick], sender_nick, retrieved);
-		}
+                play(gameMap[sender_nick], sender_nick, retrieved);
+		    }
+        }
 	}
 }
 
@@ -156,7 +164,7 @@ void Bot::privatemessage(std::string& UserNick, std::string message) {
 
     while (std::getline(stream,  line, '\n')) {
         sendResponse(botsock, priv + line + "\r\n");
-        std::cout <<"ahalan :"<< priv + line + "\r\n" << std::endl;
+        // std::cout <<"line :"<< priv + line + "\r\n" << std::endl;
     }
 }
 

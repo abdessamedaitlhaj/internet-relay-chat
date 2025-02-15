@@ -60,6 +60,7 @@ class Server {
 
 	public:
 		Server(char** av);
+		~Server();
 		bool						accept_cl();
 		void						receive(size_t & i);
 		void						setup();

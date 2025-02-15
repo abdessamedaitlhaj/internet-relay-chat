@@ -35,7 +35,7 @@
 		    std::string _password;
 		    std::string _nick;
 		    int _port;
-		    // int botsock;
+			std::string _buffer;
 
 		public:
 		    Bot(char **av);
