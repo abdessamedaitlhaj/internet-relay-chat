@@ -1,5 +1,5 @@
 #include "../include/Server.hpp"
-
+#include "../bonus/question.hpp"
 std::string Server::parse_password(std::string password)
 {
 	if (!password.empty()  && std::isspace(password.at(0)) )
@@ -62,16 +62,15 @@ void Server::serverSocket()
     if (check == -1)
         throw(std::runtime_error("setting option(O_NONBLOCK) failed"));
     check = bind(_socket, (struct sockaddr *)&_serverAddress, sizeof(_serverAddress)); //bind the socket to the address
-    if (check == -1) 
+    if (check == -1)
         throw(std::runtime_error("binding socket failed"));
     struct sockaddr_in addr;
     socklen_t addr_len = sizeof(addr);
     getsockname(_socket, (struct sockaddr*)&addr, &addr_len);
     char *serverIP = inet_ntoa(addr.sin_addr);
     check = listen(_socket, SOMAXCONN); // listen for  connections && the socket a passive socket
-    if (check == -1) 
+    if (check == -1)
         throw(std::runtime_error("listen() failed"));
-    
 
     _serverName = serverIP;
     _poll.fd = _socket;
@@ -79,7 +78,6 @@ void Server::serverSocket()
     _poll.revents = 0;
     _pollFds.push_back(_poll);
     std::cout << MAGENTA << "SERVER STARTED :   " << _socket << RESET <<"    waiting for connection " <<std::endl;
-
 }
 
 void Server::breakSignal(int signum)
@@ -107,8 +105,6 @@ bool Server::accept_cl()
     newPoll.revents = 0;
     _pollFds.push_back(newPoll);
     _clients[clientFd] = Client(clientFd);
-    // here bot initialistaion 
-    // logic 
     _clients[clientFd].setIpAddress(inet_ntoa(clientAddr.sin_addr));
     std::cout << "New client connected: " << clientFd << std::endl;
     return true ;
@@ -121,6 +117,7 @@ void Server::receive(size_t & i)
     int bytes = recv(_pollFds[i].fd, buffer, sizeof(buffer) - 1, 0);
 
     if (bytes <= 0) {
+        std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
         // Client disconnected
         close(_pollFds[i].fd);
         _clients.erase(_pollFds[i].fd);
@@ -162,6 +159,7 @@ void Server::setup() {
             }
         }
     }
+
 }
 
 // parse data
@@ -179,7 +177,6 @@ void Server::handleBuffer(int fd, std::string &buffer) {
     client->clearBuffer();
     return;
 }
-
 void Server::removeFd(int fd)
 {
     for (size_t i = 0; i < _pollFds.size(); i++)

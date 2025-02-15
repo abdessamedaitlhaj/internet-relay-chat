@@ -1,10 +1,15 @@
 #include "../include/Channel.hpp"
                         
-
 Channel::Channel(const std::string &name) : _name(name) {
     _inviteOnly = false;
     _topicRestriction = false;
     _userLimit = false;
+    _limit = 0;
+    _auth = false;
+    _topicTime = 0;
+    _password = "";
+    
+
 }
 
 Channel::~Channel() {
@@ -14,8 +19,8 @@ std::string Channel::getName() const {
     return _name;
 }
 
-bool Channel::getlimit() const {
-    return _userLimit;
+int Channel::getlimit() const {
+    return _limit;
 }
 
 std::string Channel::getTopic() const {

@@ -59,7 +59,6 @@ void Server::parseCommand(int fd, std::string input) {
     Client* client = getClient(fd);
     std::string command, params;
     std::vector<std::string> tokens;
-
     if (!client || input.empty())
         return;
     size_t pos = input.find_first_not_of("\t ");
@@ -70,8 +69,12 @@ void Server::parseCommand(int fd, std::string input) {
     for (size_t i = 0; i < command.length(); ++i) {
         command[i] = toupper(command[i]);
     }
-
-
+    if (!(client->fix))
+    {
+    client->setStart();
+    client->fix = true ;
+    }
+    //check here for bot authentification
     if (command == "PASS")
         handlePass(fd, input, *client);
     else if (command == "NICK")
@@ -79,8 +82,6 @@ void Server::parseCommand(int fd, std::string input) {
     else if (command == "USER")
         handleUser(fd, input, *client);
     else if (client->isRegistered()) {
-        client->setStart();
-        
         if (command == "TOPIC")
             handleTopic(fd, input, *client);
         else if (command == "PRIVMSG")
@@ -123,11 +124,27 @@ Client *Server::getClientNick(std::string &nick) {
     return (NULL);
 }
 
-Client *Server::getClientUserName(std::string &nick) {
+std::string Server::getTrailing(std::vector<std::string> &tokens, std::string &trailing) {
 
-    for (size_t i = 0; i < _clients.size(); i++) {
-        if (_clients[i].getUserName() == nick)
-            return (&_clients[i]);
+    std::string last;
+    size_t pos;
+    if (tokens.size() > 3)
+        last = tokens[2].find_first_of(":") != std::string::npos ? getMsg(tokens, 2) : tokens[2];
+    else if (tokens.size() == 3)
+        last = tokens[2];
+
+    pos = last.find_first_of(":");
+    if (pos != std::string::npos)
+        trailing = last.substr(pos + 1);
+    else
+        trailing = last;
+    return trailing;
+}
+
+std::string Server::getMsg(std::vector<std::string> &tokens, int start) {
+    std::string msg;
+    for (size_t i = start; i < tokens.size(); ++i) {
+        i == tokens.size() - 1 ? msg += tokens[i] : msg += tokens[i] + " ";
     }
-    return (NULL);
+    return msg;
 }

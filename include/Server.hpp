@@ -4,10 +4,13 @@
 #include "Channel.hpp"
 #include "numericReplies.hpp"
 
+#include "../bonus/question.hpp"
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
+
 #include <poll.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -17,6 +20,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <sstream>
+#include <numeric>
 #include <algorithm>
 #include <ctime>
 #include <sstream>
@@ -41,6 +45,13 @@
 #define MAGENTA "\e[1;35m"
 #define CYAN    "\e[1;36m"
 #define WHITE   "\e[1;37m"
+
+struct ModeChange {
+    char mode;
+    char sign;
+    std::string argument;
+};
+
 
 class Client;
 
@@ -91,10 +102,15 @@ class Server {
 		void						handleQuit(int fd, std::string &input, Client &client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
-		std::string 				getMsg(std::vector<std::string> &tokens);
-		
+		std::string 				getMsg(std::vector<std::string> &tokens, int start);
+		std::string 				checkModes(int fd, ModeChange &modeChange, Channel &channel, std::map<char, std::string> &params);
 
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
 		void						removeFd(int fd);
+		std::string					getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
+		std::string					applyModes(int fd, std::vector<ModeChange>& modeChanges, Channel &channel);
+		std::string					getTrailing(std::vector<std::string> &tokens, std::string &trailing);
+		bool						isChannel(int fd, std::string &target, Client &client, std::string &trailing);
+		bool						isClient(int fd, std::string &target, Client &client, std::string &trailing);
 };

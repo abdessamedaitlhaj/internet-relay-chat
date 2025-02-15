@@ -12,7 +12,6 @@ class Client {
     private:
         int _fd;
         bool _registered;
-        clock_t _start;
         std::string _password;
         std::string _nickName;
         std::string _userName;
@@ -23,11 +22,18 @@ class Client {
         std::string _ipAddress;
         std::vector<Channel*> _channels;
         std::vector<std::string> InviteChannels;
+        bool _started;
     public:
+        // clock_t start;
+        time_t start_time;
+        char answer;
+        bool fix;
+        bool questionSent;
+
         Client();
         Client(int fd);
         ~Client();
-
+        void setStarted(bool b);
         int getFd() const;
         bool isRegistered() const;
         bool getInviteChannel(const std::string& name) const;
@@ -39,6 +45,8 @@ class Client {
         std::string getIpAddress() const;
         std::string getBuffer() const;
         int getLevel() const ;
+        void setLevel(int number)  ;
+        bool getStarted() const ;
 
         void addLevel();
         void setFd(int fd);

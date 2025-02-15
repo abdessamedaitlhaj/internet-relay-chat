@@ -1,7 +1,7 @@
 #include "question.hpp"
-#include "pool.hpp"
 
-QuestionGame::QuestionGame()
+
+QuestionGame::QuestionGame() :  started(false), questionSent(false), correctAnswer(' '), level(1)
 {
 		initializeLevel1();
 		initializeLevel2();
@@ -120,3 +120,30 @@ QuestionGame::Question &QuestionGame::getRandomQuestion(int level) {
     int index = rand() % levels[level - 1].size();
     return levels[level - 1][index];
 }
+
+std::string QuestionGame::gameMessage(int flag)
+{
+    if (flag == MENU)
+        return MENU_MESSAGE;
+    
+    if (flag == END)
+        return END_MESSAGE;
+    
+    if (flag == WELCOME)
+        return WELCOME_MESSAGE;
+    
+    if (flag == LVL1)
+        return LVL1_MESSAGE;
+    
+    if (flag == LVL2)
+        return LVL2_MESSAGE;
+    
+    if (flag == LVL3)
+        return LVL3_MESSAGE;
+    
+    if (flag == LVL4)
+        return LVL4_MESSAGE;
+    
+	return (END_MESSAGE);
+}
+

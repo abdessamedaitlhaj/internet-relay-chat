@@ -34,14 +34,15 @@ class Channel {
         std::string getName() const;
         std::string getTopic() const;
 
-        bool getlimit() const;
+        int getlimit() const;
         bool getTopicRestriction() const;
         bool getInviteOnly() const;
         bool getUserLimit() const;
         bool getAuth() const;
-        int getLimit() const;
         std::string getPassword() const;
         Client *getclient(std::string name);
+        int getLimit() const;
+        
         bool getMode(char mode) const;
         void setInviteOnly(bool inviteOnly);
         void setAuth(bool auth);
