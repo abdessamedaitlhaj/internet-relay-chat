@@ -105,7 +105,7 @@ void Channel::addOperator(Client *client) {
 
 void Channel::removeOperator(Client *client) {
     for (size_t i = 0; i < _operators.size(); ++i) {
-        if (&_operators[i] == client) {
+        if (_operators[i].getNickName() == client->getNickName()) {
             _operators.erase(_operators.begin() + i);
             return;
         }
@@ -129,13 +129,9 @@ bool Channel::isOperator(Client *client) const {
     }
     return false;
 }
-bool Channel::isInvited(Client *client, std::string name, int flg) const {
-    if (client->getInviteChannel(name)){
-        if (flg == 1){
-            client->removeChannelInvite(name);
-        }
+bool Channel::isInvited(Client *client, std::string name) const {
+    if (client->getInviteChannel(name))
         return true;
-    }
     return false;
 }
 
@@ -183,4 +179,13 @@ void Channel::broadcastToAll(const std::string &message) const {
             std::cerr << "Error: Failed to send message to client " << _members[i].getFd() << std::endl;
         }
     }
+}
+
+Client *Channel::getclient(std::string name) {
+    for (size_t i = 0; i < _members.size(); ++i) {
+        if (_members[i].getNickName() == name) {
+            return &_members[i];
+        }
+    }
+    return NULL;
 }

@@ -179,3 +179,15 @@ void Server::handleBuffer(int fd, std::string &buffer) {
     client->clearBuffer();
     return;
 }
+
+void Server::removeFd(int fd)
+{
+    for (size_t i = 0; i < _pollFds.size(); i++)
+    {
+        if (_pollFds[i].fd == fd)
+        {
+            _pollFds.erase(_pollFds.begin() + i);
+            break;
+        }
+    }
+}

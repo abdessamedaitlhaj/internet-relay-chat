@@ -88,6 +88,7 @@ class Server {
 		void						handleInvite(int fd, std::string &input, Client &client);
 		void						handleKick(int fd, std::string &input, Client &client);
 		void						handlePart(int fd, std::string &input, Client &client);
+		void						handleQuit(int fd, std::string &input, Client &client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
 		std::string 				getMsg(std::vector<std::string> &tokens);
@@ -95,4 +96,5 @@ class Server {
 
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
+		void						removeFd(int fd);
 };

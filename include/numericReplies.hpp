@@ -32,7 +32,7 @@
 #define RPL_ENDOFNAMES(nickname, channelname) (": 366 " + nickname + " #" + channelname + " :END of /NAMES list" + CRLF)
 #define RPL_TOPICWHOTIME(nickName, channelName, who, time) ":@localhost 333 " + nickName + " #" + channelName + " " + who + " " + time + CRLF
 #define ERR_BADCHANNELKEY(nickName, channelName) ": 475 " + nickName + " #" + channelName + " :Cannot join channel (+k)" + CRLF
-#define ERR_USERONCHANNEL(nickName, new_user, channelName) ": 443 " + nickName + " " + new_user + channelName + " :is already on channel" + CRLF
-#define RPL_INVITING(nickName, new_user, channelName) ": 341 " + nickName + " " + new_user + " " + channelName + CRLF
+#define ERR_USERONCHANNEL(nickName, new_user, channelName) ": 443 " + nickName + " " + new_user + " " + channelName + " :is already on channel" + CRLF
+#define RPL_INVITING(nickName, new_user, channelName) ": 341 " + nickName + " " + new_user + " #" + channelName + CRLF
 #define ERR_USERNOTINCHANNEL(nickName, new_user, channelName) ": 441 " + nickName + " " + new_user + " " + channelName + " :They aren't on that channel" + CRLF
 #define ERR_BADCHANMASK(channelName) ": 476 " + channelName + " :Bad Channel Mask" + CRLF

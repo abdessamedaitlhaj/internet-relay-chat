@@ -93,6 +93,8 @@ void Server::parseCommand(int fd, std::string input) {
             handleInvite(fd, input, *client);
         else if (command == "KICK")
             handleKick(fd, input, *client);
+        else if (command == "QUIT")
+            handleQuit(fd, input, *client);
         else
             sendResponse(fd, ERR_UNKNOWNCOMMAND(client->getNickName(), command));
     } else

@@ -41,7 +41,7 @@ class Channel {
         bool getAuth() const;
         int getLimit() const;
         std::string getPassword() const;
-        
+        Client *getclient(std::string name);
         bool getMode(char mode) const;
         void setInviteOnly(bool inviteOnly);
         void setAuth(bool auth);
@@ -63,7 +63,7 @@ class Channel {
         void removeOperator(Client *client);
         bool isMember(Client *client) const;
         bool isOperator(Client *client) const;
-        bool isInvited(Client *client, std::string name, int flg) const;
+        bool isInvited(Client *client, std::string name) const;
 
         void setMode(char mode, bool enable);
         bool hasMode(char mode) const;
