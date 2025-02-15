@@ -3,7 +3,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "numericReplies.hpp"
-#include "../question.hpp"
+#include "../bonus/question.hpp"
 
 #include <string>
 #include <poll.h>
@@ -98,4 +98,5 @@ class Server {
 		std::string					getTrailing(std::vector<std::string> &tokens, std::string &trailing);
 		bool						isChannel(int fd, std::string &target, Client &client, std::string &trailing);
 		bool						isClient(int fd, std::string &target, Client &client, std::string &trailing);
+
 };

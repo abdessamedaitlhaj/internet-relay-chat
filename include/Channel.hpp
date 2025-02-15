@@ -54,12 +54,13 @@ class Channel {
         void        removeMember(Client *client);
         void        addOperator(Client *client);
         void        removeOperator(Client *client);
-        bool        isMember(Client *client) const;
+        bool        isMember(Client *client);
         bool        isOperator(Client *client) const;
-        bool        isInvited(Client *client, std::string name, int flg) const;
+        bool        isInvited(Client *client, std::string name) const;
         void        setMode(char mode, bool enable);
         bool        hasMode(char mode) const;
         void        broadcast(const std::string &message, Client *sender) const;
         std::string ChannelsclientList();
         void        broadcastToAll(const std::string &message) const;
+        Client		*getclient(std::string name);
 };

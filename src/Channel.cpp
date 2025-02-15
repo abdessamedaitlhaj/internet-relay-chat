@@ -108,14 +108,13 @@ void Channel::addOperator(Client *client) {
 void Channel::removeOperator(Client *client) {
     for (size_t i = 0; i < _operators.size(); ++i) {
         if (_operators[i].getNickName() == client->getNickName()) {
-        if (_operators[i].getNickName() == client->getNickName()) {
             _operators.erase(_operators.begin() + i);
             return;
         }
     }
 }
 
-bool Channel::isMember(Client *client) const {
+bool Channel::isMember(Client *client) {
     for (size_t i = 0; i < _members.size(); ++i) {
         if (_members[i].getNickName() == client->getNickName()) {
             return true;
