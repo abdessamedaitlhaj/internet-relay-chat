@@ -5,7 +5,7 @@ int main (int ac, char**av)
 	if (ac != 4) {
         // Print error message in red
         std::cerr << RED << "Error: " << RESET << "Expected 3 arguments, but got " << ac - 1 << std::endl;
-        std::cerr << YELLOW << "Usage: " << RESET  << "./ircserv <port> <password> <Nickname>" << std::endl;
+        std::cerr << YELLOW << "Usage: " << RESET  << "./bot <port> <password> <Nickname>" << std::endl;
         std::cerr << "port: The server listening port" << std::endl;
         std::cerr << "password: The server connection password" << std::endl;
         std::cerr << "Nickname: The bot Nickname" << std::endl;

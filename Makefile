@@ -4,21 +4,27 @@ SRC = main.cpp	src/Client.cpp src/Server.cpp src/auth.cpp src/Channel.cpp src/cm
 OBJ = $(SRC:.cpp=.o)
 HEADER = include/Server.hpp include/Client.hpp include/Channel.hpp include/numericReplies.hpp
 NAME = ircserv
+NAME_BONUS = bot
 
-
-BOT = bot/bot.cpp bot/question.cpp 
+BOT = bonus/bot.cpp bonus/question.cpp bonus/main.cpp
 SRC += ${BOT}
-BOT_HEADER = bot/bot.hpp bot/question.hpp bot/pool.hpp
+BOT_HEADER = bonus/bot.hpp bonus/question.hpp bonus/pool.hpp
 OBJ_BONUS = $(BOT:.cpp=.o)
 
 
 all: $(NAME)
+bonus: $(NAME_BONUS)
 
-$(NAME): $(OBJ) $(OBJ_BONUS)
+$(NAME): $(OBJ)
 	c++ $(CPPFLAGS) $(OBJ) -o $(NAME)
 
+%.o: %.cpp $(HEADER)
+	c++ $(CPPFLAGS) -c $< -o $@ 
 
-%.o: %.cpp $(HEADER) $(BOT_HEADER)
+$(NAME_BONUS): $(OBJ_BONUS)
+	c++ $(CPPFLAGS) $(OBJ_BONUS)  -o $(NAME_BONUS) 
+
+$(OBJ_BONUS): %.o: %.c $(BOT_HEADER)
 	c++ $(CPPFLAGS) -c $< -o $@ 
 
 
@@ -26,7 +32,7 @@ clean:
 	rm -f $(OBJ) $(OBJ_BONUS)
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(NAME) $(NAME_BONUS)
 
 re: fclean all
 

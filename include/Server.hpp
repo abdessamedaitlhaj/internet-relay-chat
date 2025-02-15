@@ -4,7 +4,7 @@
 #include "Channel.hpp"
 #include "numericReplies.hpp"
 
-#include "../bot/question.hpp"
+#include "../bonus/question.hpp"
 
 #include <iostream>
 #include <string>

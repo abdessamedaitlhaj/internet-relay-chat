@@ -1,7 +1,7 @@
 #include "question.hpp"
 
 
-QuestionGame::QuestionGame() : level(1), started(false), questionSent(false), correctAnswer(' ')
+QuestionGame::QuestionGame() :  started(false), questionSent(false), correctAnswer(' '), level(1)
 {
 		initializeLevel1();
 		initializeLevel2();

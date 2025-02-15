@@ -1,5 +1,5 @@
 #include "../include/Server.hpp"
-#include "../bot/question.hpp"
+#include "../bonus/question.hpp"
 std::string Server::parse_password(std::string password)
 {
 	if (!password.empty()  && std::isspace(password.at(0)) )
