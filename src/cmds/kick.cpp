@@ -3,7 +3,6 @@
 void Server::handleKick(int fd, std::string &input, Client& client)
 {
     std::vector<std::string> tokens;
-
     tokens = Server::split(input, std::string("\t "));
     if (tokens.size() < 3)
     {
@@ -19,7 +18,21 @@ void Server::handleKick(int fd, std::string &input, Client& client)
         nick_tokens.push_back(tokens[2]);
     std::string reason;
     if (tokens.size() > 3)
-        reason = tokens[3];
+    {
+        if (tokens[3][0] == ':')
+        {
+            tokens[3] = tokens[3].substr(1);
+            reason = "";
+            for (size_t i = 3; i < tokens.size(); i++)
+            {
+                reason += tokens[i];
+                if (i < tokens.size() - 1)
+                    reason += " ";
+            }
+        }
+        else
+            reason = tokens[3];
+    }
     else
         reason = "kicked";
     // validate channel name
@@ -63,6 +76,8 @@ void Server::handleKick(int fd, std::string &input, Client& client)
         else
             response += " :" + reason + CRLF;
         channel->broadcastToAll(response);
+        if (channel->isOperator(new_user))
+            channel->removeOperator(new_user);
         channel->removeMember(new_user);
     }
 }

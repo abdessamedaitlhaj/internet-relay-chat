@@ -10,10 +10,10 @@ class QuestionGame {
 		void  initializeLevel2();
 		void  initializeLevel3();
 		void  initializeLevel4();
-		int level;
     	bool started;
     	bool questionSent;
     	char correctAnswer; 
+		int level;
 	public :
 		struct Question {
 			std::string problem;
@@ -32,10 +32,6 @@ class QuestionGame {
     	void setStarted(bool startedFlag) { started = startedFlag; }
     	void setQuestionSent(bool flag) { questionSent = flag; }
     	void setAnswer(char answer) { correctAnswer = answer; }
-    	void addLevel() {
-			level++; 
-			if (level == 5)
-				level = 1;
-		}
+    	void addLevel() { level++; }
 
 };

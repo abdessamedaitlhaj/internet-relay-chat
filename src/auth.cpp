@@ -59,6 +59,9 @@ void Server::handleNick(int fd, std::string &input, Client &client) {
     }
     if (isNickNameInUse(tokens[1])) {
         sendResponse(fd, ERR_NICKNAMEINUSE(tokens[1]));
+    }
+    if (!isNickNameValid(tokens[1])) {
+        sendResponse(fd, ERR_ERRONEUSNICKNAME(tokens[1]));
         return;
     }
     if (client.isRegistered()) {

@@ -1,5 +1,5 @@
 #include "../include/Server.hpp"
-#include "../bot/question.hpp"
+
 std::string Server::parse_password(std::string password)
 {
 	if (!password.empty()  && std::isspace(password.at(0)) )
@@ -172,3 +172,14 @@ void Server::handleBuffer(int fd, std::string &buffer) {
     return;
 }
 
+void Server::removeFd(int fd)
+{
+    for (size_t i = 0; i < _pollFds.size(); i++)
+    {
+        if (_pollFds[i].fd == fd)
+        {
+            _pollFds.erase(_pollFds.begin() + i);
+            break;
+        }
+    }
+}

@@ -1,4 +1,5 @@
 #pragma once
+
 #define CRLF "\r\n"
 
 #define ERR_NOTREGISTERED(nickName) ": 451 " + nickName + " :You have not registered" + CRLF

@@ -144,41 +144,58 @@ void Bot::game() {
                 gameMap[sender_nick] = QuestionGame();  // Create new game object if it doesn't exist
             }
 
-            play(gameMap[sender_nick], sender_nick);
+            play(gameMap[sender_nick], sender_nick, retrieved);
 		}
 	}
 }
 
-void Bot::play(QuestionGame& game, std::string& UserNick)
-{
-    std::vector<std::string> tokens;  // You need to populate this with input tokens (e.g., from the user message)
+void Bot::privatemessage(std::string& UserNick, std::string message) {
     std::string priv = "PRIVMSG " + UserNick + " :";
+    std::istringstream stream(message);
+    std::string line;
+
+    while (std::getline(stream, line)) {
+        sendResponse(botsock, priv + line + "\r\n");
+    }
+}
+
+void Bot::play(QuestionGame& game, std::string& UserNick, std::string retrieved)
+{
     std::string response = MENU_MESSAGE;
+    std::vector<std::string> tokens;
+    std::istringstream stream(retrieved);
+    std::string token;
+
+    while (stream >> token) {  // Automatically splits by spaces or tabs
+        tokens.push_back(token);
+    }
 
     // Ensure correct number of tokens
     std::cout << tokens.size() << std::endl;
-    if (tokens.size() != 3)
-        return sendResponse(botsock, priv + response);
+    if (tokens.size() != 4)
+        return privatemessage(UserNick, response);
 
     // Check if it's a valid game-related command
-    bool tokenGame = (tokens[2] == "start" || tokens[2] == "a" || tokens[2] == "b" || tokens[2] == "c" || tokens[2] == "d");
-        std::cout <<  "lol\n";
+    bool start = (tokens[3] == "start" || tokens[3] == ":start");
+    bool charGame = ( tokens[3] == "a" || tokens[3] == "b" || tokens[3] == "c" || tokens[3] == "d");
+    bool charSemi = (tokens[3] == ":a" || tokens[3] == ":b" || tokens[3] == ":c" || tokens[3] == ":d") ;
+    bool tokenGame = start || charGame || charSemi;
     if (!tokenGame)
-        return sendResponse(botsock, priv + response);  // Only process valid game tokens
+        return privatemessage(UserNick, response);  // Only process valid game tokens
 
     // Start the game
-    if (tokens[2] == "start") {
+    if (start) {
         if (game.getStarted()) {
-            sendResponse(botsock, priv + "The game has already started!\n");
+            privatemessage(UserNick, "The game has already started!\n");
             return;
         }
-        sendResponse(botsock, priv + WELCOME_MESSAGE);
+        privatemessage(UserNick,+ WELCOME_MESSAGE);
         game.setStarted(true);  // Mark the game as started
         game.setQuestionSent(false);  // No question has been sent yet
 
         // Send the first question immediately after the game starts
         QuestionGame::Question q = game.getRandomQuestion(game.getLevel());
-        sendResponse(botsock, priv + q.problem);  // Send the question to the user
+        privatemessage(UserNick, q.problem);  // Send the question to the user
         game.setAnswer(q.correct);  // Set the correct answer for this question
         game.setQuestionSent(true);  // Mark that the question has been sent
 
@@ -186,36 +203,49 @@ void Bot::play(QuestionGame& game, std::string& UserNick)
     }
 
     // Process the answer choices: "a", "b", "c", "d"
-    if (tokens[3] == "a" || tokens[3] == "b" || tokens[3] == "c" || tokens[3] == "d") {
+    if (charGame || charSemi) {
         if (!game.isQuestionSent()) {
-            sendResponse(botsock, priv + "You need to start the game first!\n");
+            privatemessage(UserNick,  "You need to start the game first!\n");
             return;
         }
 
-        if (tokens[3].at(0) == game.getAnswer()) {  // Check if the answer matches the correct one
+        if ((charGame && tokens[3].at(0) == game.getAnswer()) || (charSemi && tokens[3].at(1) == game.getAnswer())) {  // Check if the answer matches the correct one
             // Correct answer handling
             switch (game.getLevel()) {
                 case 1:
-                    sendResponse(botsock, priv + LVL1_MESSAGE);
+                    privatemessage(UserNick, LVL1_MESSAGE);
                     break;
                 case 2:
-                    sendResponse(botsock, priv + LVL2_MESSAGE);
+                    privatemessage(UserNick, LVL2_MESSAGE);
                     break;
                 case 3:
-                    sendResponse(botsock, priv + LVL3_MESSAGE);
+                    privatemessage(UserNick, LVL3_MESSAGE);
                     break;
                 case 4:
-                    sendResponse(botsock, priv + LVL4_MESSAGE);
+                    privatemessage(UserNick, LVL4_MESSAGE);
                     break;
                 default:
-                    sendResponse(botsock, priv + "You won the game!");
+                    privatemessage(UserNick, "You won the game!");
                     break;
             }
             game.addLevel();  // Increase level after correct answer
-            game.setQuestionSent(false);  // Reset question sent flag
+            game.setQuestionSent(false); 
+
+            if (game.getLevel() != 5)
+            {
+                QuestionGame::Question nextQ = game.getRandomQuestion(game.getLevel());
+                privatemessage(UserNick, nextQ.problem);  // Send the next question
+                game.setAnswer(nextQ.correct);  // Set the correct answer for the new question
+                game.setQuestionSent(true);
+            }
+            else
+            {
+                game.setLevel(1);
+                game.setStarted(false);
+            }
         } else {
             // Incorrect answer handling
-            sendResponse(botsock, priv + END_MESSAGE);
+            privatemessage(UserNick, END_MESSAGE);
             game.setLevel(1);  // Reset to level 1
             game.setStarted(false);  // Game ends, so reset started flag
             game.setQuestionSent(false);  // Reset question sent flag

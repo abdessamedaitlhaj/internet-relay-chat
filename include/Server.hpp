@@ -3,7 +3,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "numericReplies.hpp"
-#include "../bot/question.hpp"
+#include "../question.hpp"
 
 #include <string>
 #include <poll.h>
@@ -84,12 +84,15 @@ class Server {
 		void						handleMode(int fd, std::string &input, Client &client);
 		void						handleInvite(int fd, std::string &input, Client &client);
 		void						handleKick(int fd, std::string &input, Client &client);
+		void						handlePart(int fd, std::string &input, Client &client);
+		void						handleQuit(int fd, std::string &input, Client &client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
 		std::string 				getMsg(std::vector<std::string> &tokens, int start);
 		std::string 				checkModes(int fd, ModeChange &modeChange, Channel &channel, std::map<char, std::string> &params);
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
+		void						removeFd(int fd);
 		std::string					getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
 		std::string					applyModes(int fd, std::vector<ModeChange>& modeChanges, Channel &channel);
 		std::string					getTrailing(std::vector<std::string> &tokens, std::string &trailing);

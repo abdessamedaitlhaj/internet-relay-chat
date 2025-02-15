@@ -4,7 +4,6 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
 {
     std::vector<std::string> tokens;
     tokens = Server::split(input, std::string("\t "));
-
     if (tokens.size() < 2)
     {
         sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));
@@ -62,9 +61,9 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
             Channel *new_channel = new Channel(_channel_name);
             new_channel->setname(_channel_name);
             new_channel->addOperator(&client);
-            _channels.push_back(new_channel);//add channel to server
-            new_channel->addMember(&client);//add member to channel
-            channel = new_channel;//set channel to new channel
+            _channels.push_back(new_channel);
+            new_channel->addMember(&client);
+            channel = new_channel;
         }
         else
         {
@@ -72,24 +71,23 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
             {
                 continue ;
             }
-            if (channel->getInviteOnly())
-            {
-                if(!channel->isInvited(&client, _channel_name, 1))
-                {
-                    sendResponse(fd, ERR_INVITEONLYCHAN(client.getNickName(), _channel_name));
-                    continue ;
-                }
-            }
             if (!channel->getPassword().empty() && channel->getPassword() != password)
             {
-                if (!channel->isInvited(&client, _channel_name, 0))
+                if (!channel->isInvited(&client, _channel_name))
                 {
                     sendResponse(fd, ERR_BADCHANNELKEY(client.getNickName(), _channel_name));
                     continue ;
                 }
             }
-            std::cout << "channel limit : " << channel->getlimit() << std::endl;
-            std::cout << "channel clients number : " << channel->getclientsnumber() << std::endl;
+            if (channel->getInviteOnly())
+            {
+                if(!channel->isInvited(&client, _channel_name))
+                {
+                    sendResponse(fd, ERR_INVITEONLYCHAN(client.getNickName(), _channel_name));
+                    continue ;
+                }
+                client.removeChannelInvite(_channel_name);
+            }
             if (channel->getlimit() && (channel->getlimit() <= channel->getclientsnumber()))
             {
                 sendResponse(fd, ERR_CHANNELISFULL(client.getNickName(), _channel_name));

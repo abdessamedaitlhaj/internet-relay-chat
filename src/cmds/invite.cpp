@@ -3,7 +3,6 @@
 void Server::handleInvite(int fd, std::string &input, Client &client)
 {
     std::vector<std::string> tokens;
-
     tokens = Server::split(input, std::string("\t "));
     if (tokens.size() < 3)
     {
