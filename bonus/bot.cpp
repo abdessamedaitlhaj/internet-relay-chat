@@ -1,6 +1,6 @@
 #include "bot.hpp"
 
-
+int botsock;
 
 Bot::Bot(char **av) {
     _log = false;
@@ -58,7 +58,7 @@ int Bot::parse_port(std::string port)
     return parsedPort;
 }
 
-void Bot::sendResponse(int fd, const std::string& response) {
+void sendResponse(int fd, const std::string& response) {
     if (send(fd, response.c_str(), response.length(), 0) == -1) {
         std::cerr << "Error: Failed to send response to client " << fd << std::endl;
     }
@@ -68,7 +68,7 @@ void handle(int signum){
 	(void)signum;
 	std::cout << std::endl << "Signal received !!" << std::endl;
     // maybe send quit to the server if they handled it 
-    exit(1);
+    sendResponse(botsock, "QUIT " "\r\n");
 }
 
 
@@ -154,8 +154,9 @@ void Bot::privatemessage(std::string& UserNick, std::string message) {
     std::istringstream stream(message);
     std::string line;
 
-    while (std::getline(stream, line)) {
+    while (std::getline(stream,  line, '\n')) {
         sendResponse(botsock, priv + line + "\r\n");
+        std::cout <<"ahalan :"<< priv + line + "\r\n" << std::endl;
     }
 }
 

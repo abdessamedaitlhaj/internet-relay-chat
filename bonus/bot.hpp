@@ -35,13 +35,12 @@
 		    std::string _password;
 		    std::string _nick;
 		    int _port;
-		    int botsock;
+		    // int botsock;
 
 		public:
 		    Bot(char **av);
 		    ~Bot();
 		    void setup();
-		    void sendResponse(int fd, const std::string& response);
 		    void game();
 		    void play(QuestionGame& game, std::string& UserNick, std::string command);
 		    void privatemessage(std::string& UserNick, std::string message);

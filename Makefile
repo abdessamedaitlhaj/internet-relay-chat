@@ -7,7 +7,6 @@ NAME = ircserv
 NAME_BONUS = bot
 
 BOT = bonus/bot.cpp bonus/question.cpp bonus/main.cpp
-# SRC += ${BOT}
 BOT_HEADER = bonus/bot.hpp bonus/question.hpp bonus/pool.hpp
 OBJ_BONUS = $(BOT:.cpp=.o)
 
