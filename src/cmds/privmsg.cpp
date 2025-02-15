@@ -7,17 +7,18 @@ bool Server::isChannel(int fd, std::string &target, Client &client, std::string 
         std::string channelName = target.substr(1);
         if (!getChannel(channelName)) {
             sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), "#" + channelName));
-            return false;
+            return true;
         }
         Channel *channel = getChannel(channelName);
         if (!channel->isMember(&client)) {
             sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), channelName));
-            return false;
+            return true;
         }
         std::string response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG #" + channelName + " :" + trailing + CRLF;
         channel->broadcast(response, &client);
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool Server::isClient(int fd, std::string &target, Client &client, std::string &trailing) {
@@ -25,7 +26,7 @@ bool Server::isClient(int fd, std::string &target, Client &client, std::string &
     Client *cli = getClientNick(target);
     if (!cli) {
         sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), target));
-        return false;
+        return true;
     }
     std::string response = ":" + client.getHostName() + client.getIpAddress() + " PRIVMSG " + target + " :" + trailing + CRLF;
     sendResponse(cli->getFd(), response);
@@ -51,9 +52,9 @@ void Server::handlePrivmsg(int fd, std::string &input, Client &client) {
     for (size_t i = 0; i < targts.size(); ++i) {
         trailing = getTrailing(tokens, trailing);
         target = targts[i];
-        if (!isChannel(fd, target, client, trailing))
-            return;
-        if (!isClient(fd, target, client, trailing))
-            return;
+        if (isChannel(fd, target, client, trailing))
+            continue;
+        else if (isClient(fd, target, client, trailing))
+            continue;
     }
 }

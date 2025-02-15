@@ -14,19 +14,15 @@ int Server::parse_port(std::string port)
     if (port.empty()) {
         throw std::invalid_argument("Port cannot be empty.");
     }
-
     for (size_t i = 0; i < port.length(); ++i) {
         if (!std::isdigit(port[i])) {
             throw std::invalid_argument("Port contains non-numeric characters.");
         }
     }
     int parsedPort = std::atoi(port.c_str());
-
     if (parsedPort <= 0 || parsedPort > 65535) {
         throw std::out_of_range("Port number must be between 1 and 65535.");
     }
-
-    // exclude well known ports 0 --> 1023
     if (parsedPort >= 0 && parsedPort <= 1023) {
         throw std::invalid_argument("Port is a reserved, well-known port.");
     }
@@ -45,7 +41,6 @@ Server::Server(char** av) {
 
 void Server::serverSocket() 
 {
-    //add comment later
     _serverAddress.sin_family = AF_INET; //ipv4
     _serverAddress.sin_port = htons(_port); // network byte order
     _serverAddress.sin_addr.s_addr = INADDR_ANY; // any local machine
@@ -116,9 +111,11 @@ void Server::receive(size_t & i)
     char buffer[1024];
     int bytes = recv(_pollFds[i].fd, buffer, sizeof(buffer) - 1, 0);
 
+    if (sizeof(buffer) == 0)
+        return;
+
     if (bytes <= 0) {
         std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
-        // Client disconnected
         close(_pollFds[i].fd);
         _clients.erase(_pollFds[i].fd);
         _pollFds.erase(_pollFds.begin() + i);
@@ -159,10 +156,7 @@ void Server::setup() {
             }
         }
     }
-
 }
-
-// parse data
 
 void Server::handleBuffer(int fd, std::string &buffer) {
 

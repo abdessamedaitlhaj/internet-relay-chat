@@ -11,7 +11,7 @@ std::vector<ModeChange> parseModes(const std::string& modes, std::queue<std::str
             sign = '-';
         } else {
             std::string arg;
-            if ( !args.empty() && (modes[i] == 'k' || modes[i] == 'l' || modes[i] == 'o') && sign == '+') {
+            if ( !args.empty() && ((modes[i] == 'l' && sign == '+') || (modes[i] == 'k' && sign == '+') || (modes[i] == 'o' && sign))) {
                 arg = args.front();
                 args.pop();
             }
@@ -49,7 +49,7 @@ std::string getAllModes(Channel *channel) {
     return modes;
 }
 
-std::string accumulateStrings(std::map<char, std::string> &params) {
+std::string accumulateStrings(std::map<char, std::string> &params, std::vector<std::string> &opsParams) {
 
     std::string result;
     std::map<char, std::string>::iterator it = params.begin();
@@ -60,10 +60,17 @@ std::string accumulateStrings(std::map<char, std::string> &params) {
         if (it != params.end())
             result += " ";
     }
+    if (!result.empty() && !opsParams.empty())
+        result += " ";
+    for (size_t i = 0; i < opsParams.size(); ++i) {
+        result += opsParams[i];
+        if (i != opsParams.size() - 1)
+            result += " ";
+    }
     return result;
 }
 
-std::string toStrings(std::set<char> &add, std::set<char> &remove) {
+std::string toStrings(std::set<char> &add, std::set<char> &remove, std::vector<char> &addOps, std::vector<char> &removeOps) {
 
     std::string plus;
     std::string minus;
@@ -73,10 +80,27 @@ std::string toStrings(std::set<char> &add, std::set<char> &remove) {
             plus += *it;
         }
     }
+    if (!addOps.empty()) {
+        if (add.empty())
+            plus += "+";
+        for (size_t i = 0; i < addOps.size(); ++i) {
+            plus += addOps[i];
+        }
+    }
     if (!remove.empty()) {
         minus += "-";
         for (std::set<char>::iterator it = remove.begin(); it != remove.end(); ++it) {
             minus += *it;
+        }
+        for (size_t i = 0; i < removeOps.size(); ++i) {
+            minus += removeOps[i];
+        }
+    }
+    if (!removeOps.empty()) {
+        if (remove.empty())
+            minus += "-";
+        for (size_t i = 0; i < removeOps.size(); ++i) {
+            minus += removeOps[i];
         }
     }
 
@@ -90,6 +114,9 @@ std::string Server::applyModes(int fd, std::vector<ModeChange>& modeChanges, Cha
     std::set<char> add;
     std::set<char> remove;
     std::map<char, std::string> params;
+    std::vector<char> removeOps;
+    std::vector<char> addOps;
+    std::vector<std::string> opsParams;
 
     std::string channelName = channel.getName();
     for (size_t i = 0; i < modeChanges.size(); ++i) {
@@ -136,32 +163,32 @@ std::string Server::applyModes(int fd, std::vector<ModeChange>& modeChanges, Cha
                 channel.setPassword("");
                 remove.insert('k');
             }
-        } else if (modeChanges[i].sign && modeChanges[i].mode == 'o') {
-            if (!modeChanges[i].argument.empty()) {
+        } else if (modeChanges[i].sign && modeChanges[i].mode == 'o' && !modeChanges[i].argument.empty()) {
                 Client *op = getClientNick(modeChanges[i].argument);
                 if (op && channel.isMember(op)) {
-                    if (modeChanges[i].sign == '+' && fd != op->getFd()) {
+                    if (modeChanges[i].sign == '+' && !channel.isOperator(op)) {
                         channel.addOperator(op);
-                        add.insert('o');
-                        params['o'] = modeChanges[i].argument;
-                    } else {
+                        addOps.push_back('o');
+                        opsParams.push_back(modeChanges[i].argument);
+                    }
+                    if (modeChanges[i].sign == '-' && channel.isOperator(op)) {
                         channel.removeOperator(op);
-                        remove.insert('o');
+                        removeOps.push_back('o');
+                        opsParams.push_back(modeChanges[i].argument);
                     }
                 }
                 else {
                     if (op && !channel.isMember(op))
-                        sendResponse(fd, ERR_NOTONCHANNEL(client->getNickName(), channelName));
+                        sendResponse(fd, ERR_USERNOTINCHANNEL(client->getNickName(), modeChanges[i].argument, channelName));
                     else
                         sendResponse(fd, ERR_NOSUCHNICK(client->getNickName(), modeChanges[i].argument));
                 }
-            }
         }
         if (modeChanges[i].mode != 'o' && modeChanges[i].mode != 'l' && modeChanges[i].mode != 'k' && modeChanges[i].mode != 't' && modeChanges[i].mode != 'i')
             sendResponse(fd, ERR_UNKNOWNMODE(client->getNickName(), std::string(1, modeChanges[i].mode)));
     }
-    modes = toStrings(add, remove);
-    std::string paramsToString = accumulateStrings(params);
+    modes = toStrings(add, remove, addOps, removeOps);
+    std::string paramsToString = accumulateStrings(params, opsParams);
     if (!paramsToString.empty())
         modes += " " + paramsToString;
     return modes;

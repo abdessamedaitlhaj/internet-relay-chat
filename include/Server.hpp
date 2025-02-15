@@ -3,27 +3,17 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "numericReplies.hpp"
-
 #include "../bot/question.hpp"
 
-#include <iostream>
 #include <string>
-#include <vector>
-#include <map>
-
 #include <poll.h>
-#include <arpa/inet.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <signal.h>
 #include <cctype>
-#include <cstdlib>
 #include <stdexcept>
-#include <sstream>
 #include <numeric>
 #include <algorithm>
 #include <ctime>
-#include <sstream>
 #include <iomanip>
 #include <cstdlib>
 #include <iostream>
@@ -52,7 +42,6 @@ struct ModeChange {
     std::string argument;
 };
 
-
 class Client;
 
 class Server {
@@ -71,15 +60,14 @@ class Server {
 
 	public:
 		Server(char** av);
-		bool accept_cl();
-		void receive(size_t & i);
+		bool						accept_cl();
+		void						receive(size_t & i);
 		void						setup();
 		void						serverSocket();
 		int							parse_port(std::string port);
 		std::string 				parse_password(std::string password);
 		static void 				breakSignal(int signum);
 		Client*						getClient(int fd);
-
 		Channel 					*getChannel(std::string &name);
 		std::vector<std::string> 	parseData(Client* client);
 		void 						parseCommand(int fd, std::string input);
@@ -87,8 +75,6 @@ class Server {
 		void 						sendResponse(int fd, const std::string& response);
 		void 						handleBuffer(int fd, std::string &buffer);
 		std::vector<std::string> 	split(const std::string &str, const std::string &delimiters);
-		
-		// AUTH
 		void						handlePass(int fd, std::string &input, Client &client);
 		void						handleNick(int fd, std::string &input, Client &client);
 		void						handleUser(int fd, std::string &input, Client &client);
@@ -102,7 +88,6 @@ class Server {
 		void 						addChannel(Channel *channel);
 		std::string 				getMsg(std::vector<std::string> &tokens, int start);
 		std::string 				checkModes(int fd, ModeChange &modeChange, Channel &channel, std::map<char, std::string> &params);
-
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
 		std::string					getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);

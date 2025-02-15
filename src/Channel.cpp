@@ -8,8 +8,6 @@ Channel::Channel(const std::string &name) : _name(name) {
     _auth = false;
     _topicTime = 0;
     _password = "";
-    
-
 }
 
 Channel::~Channel() {
@@ -46,9 +44,8 @@ time_t Channel::getTopicTime() const {
     return _topicTime;
 }
 int Channel::getclientsnumber() const {
-    return _members.size(); //check operator
+    return _members.size();
 }
-
 
 bool Channel::getAuth() const {
     return _auth;
@@ -110,7 +107,7 @@ void Channel::addOperator(Client *client) {
 
 void Channel::removeOperator(Client *client) {
     for (size_t i = 0; i < _operators.size(); ++i) {
-        if (&_operators[i] == client) {
+        if (_operators[i].getNickName() == client->getNickName()) {
             _operators.erase(_operators.begin() + i);
             return;
         }
@@ -134,6 +131,7 @@ bool Channel::isOperator(Client *client) const {
     }
     return false;
 }
+
 bool Channel::isInvited(Client *client, std::string name, int flg) const {
     if (client->getInviteChannel(name)){
         if (flg == 1){
@@ -167,7 +165,6 @@ std::string Channel::ChannelsclientList() {
     std::set<std::string> seen;
     for (size_t i = 0; i < _members.size(); ++i) {
         std::string nickname = _members[i].getNickName();
-        // Avoid duplicate entries
         if (seen.find(nickname) != seen.end())
             continue;
         seen.insert(nickname);

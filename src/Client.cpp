@@ -3,12 +3,10 @@
 // Constructor
 Client::Client() : _fd(-1), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("")  {}
 
-Client::Client(int fd) : _fd(fd), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("") , _started(false), fix(false), questionSent(false){}
+Client::Client(int fd) : _fd(fd), _registered(false), _nickName(""), _userName(""), _hostName(""),_level(1), _buffer("") , _started(false) {}
 
-// Destructor
 Client::~Client() {}
 
-// Getter methods
 int Client::getFd() const {
     return _fd;
 }
@@ -55,7 +53,6 @@ std::string Client::getBuffer() const {
     return _buffer;
 }
 
-// Setter methods
 void Client::setFd(int fd) {
     _fd = fd;
 }
@@ -95,21 +92,13 @@ void Client::setStarted(bool b) {
 bool Client::getStarted() const {
    return _started;
 }
-void Client::setStart() {
-    start_time = time(NULL);
-}
-void Client::addLevel() {
-    _level++;
-    if (_level == 5)
-        _level = 1;
-}
+
 int Client::getLevel() const {
    return _level;
 }
 void  Client::setLevel(int number)  {
     _level = number;
 }
-
 
 void Client::clearBuffer() {
 
@@ -130,6 +119,7 @@ void Client::removeChannelInvite(std::string &name) {
 void Client::addChannel(Channel* channel) {
     _channels.push_back(channel);
 }
+
 void Client::addInviteChannel(std::string &name) {
     InviteChannels.push_back(name);
 }

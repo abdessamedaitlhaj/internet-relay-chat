@@ -69,12 +69,7 @@ void Server::parseCommand(int fd, std::string input) {
     for (size_t i = 0; i < command.length(); ++i) {
         command[i] = toupper(command[i]);
     }
-    if (!(client->fix))
-    {
-    client->setStart();
-    client->fix = true ;
-    }
-    //check here for bot authentification
+
     if (command == "PASS")
         handlePass(fd, input, *client);
     else if (command == "NICK")
