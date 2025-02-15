@@ -65,6 +65,8 @@ void Server::parseCommand(int fd, std::string input) {
     if (pos != std::string::npos)
         input = input.substr(pos);
     tokens = Server::split(input, std::string("\t "));
+    if (tokens.empty())
+        return;
     command = tokens[0];
     for (size_t i = 0; i < command.length(); ++i) {
         command[i] = toupper(command[i]);

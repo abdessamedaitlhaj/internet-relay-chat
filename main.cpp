@@ -17,7 +17,6 @@ int main(int ac, char** av) {
         Server.setup();
     }
     catch (const std::exception& e) {
-        //clean up
         std::cerr << e.what() << std::endl;
         return 1;
     }
