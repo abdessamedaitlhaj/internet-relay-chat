@@ -57,7 +57,7 @@ Server::Server(char** av) {
 
 void Server::serverSocket() 
 {
-    _serverAddress.sin_family = AF_INET; //ipv4
+    _serverAddress.sin_family = AF_INET;
     _serverAddress.sin_port = htons(_port); // network byte order
     _serverAddress.sin_addr.s_addr = INADDR_ANY; // any local machine
     _socket = socket(AF_INET, SOCK_STREAM, 0); // server socket fd
