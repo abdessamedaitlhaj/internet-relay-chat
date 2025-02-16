@@ -63,6 +63,7 @@ void Server::handleNick(int fd, std::string &input, Client &client) {
     }
     if (isNickNameInUse(tokens[1])) {
         sendResponse(fd, ERR_NICKNAMEINUSE(tokens[1]));
+        return;
     }
     if (client.isRegistered()) {
         std::string response = ":" + client.getHostName() + client.getIpAddress() + " NICK " + tokens[1] + CRLF;

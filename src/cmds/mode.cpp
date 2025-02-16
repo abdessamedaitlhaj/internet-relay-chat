@@ -92,9 +92,6 @@ std::string toStrings(std::set<char> &add, std::set<char> &remove, std::vector<c
         for (std::set<char>::iterator it = remove.begin(); it != remove.end(); ++it) {
             minus += *it;
         }
-        for (size_t i = 0; i < removeOps.size(); ++i) {
-            minus += removeOps[i];
-        }
     }
     if (!removeOps.empty()) {
         if (remove.empty())

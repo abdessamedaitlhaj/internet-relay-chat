@@ -2,11 +2,9 @@
 
 bool    Server::channelNameValid(std::string &channelName) {
 
-    if (channelName.empty() || channelName.length() < 2 || (channelName[0] != '#') || channelName.length() > 50) {
+    if (channelName.empty() || channelName.length() < 2 || channelName[0] != '#' || channelName.length() > 50)
         return false;
-    }
     for (size_t i = 1; i < channelName.length(); ++i) {
-
         if (!std::isalnum(channelName[i])) {
             return false;
         }
