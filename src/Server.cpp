@@ -11,8 +11,15 @@ Server::~Server() {
 
 std::string Server::parse_password(std::string password)
 {
+    if (password.empty())
+        throw std::invalid_argument("Error: Password cannot be empty.");
 	if (!password.empty()  && std::isspace(password.at(0)) )
 		throw std::invalid_argument("Error: Password must not start with a whitespace character.");
+    for (size_t i = 0; i < password.length(); ++i) {
+        if (std::isspace(password[i]) || !std::isprint(password[i])) {
+            throw std::invalid_argument("Error: Password contains invalid characters.");
+        }
+    }
 	return(password);
 }
 

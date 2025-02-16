@@ -28,6 +28,8 @@ std::string Bot::parse_password(std::string password)
 
 std::string Bot::parse_nick(std::string nick)
 {
+    if (nick.empty())
+        throw std::invalid_argument("Error: Nickname cannot be empty.");
 	if (!nick.empty()  && std::isspace(nick.at(0)) )
 		throw std::invalid_argument("Error: nick must not start with a whitespace character.");
 	return(nick);
