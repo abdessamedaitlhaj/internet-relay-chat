@@ -51,7 +51,7 @@ void Server::handleTopic(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channelName));
         return;
     }
-    trailing = getTrailing(tokens, trailing);
+    trailing = getTrailing(tokens, trailing, input);
     channel->setTopic(trailing);
     std::string response = ":" + client.getHostName() + client.getIpAddress() + " TOPIC #" + channelName + " :" + trailing + CRLF;
     channel->broadcastToAll(response);

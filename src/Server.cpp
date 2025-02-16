@@ -43,7 +43,6 @@ int Server::parse_port(std::string port)
     if (parsedPort >= 0 && parsedPort <= 1023) {
         throw std::invalid_argument("Port is a reserved, well-known port.");
     }
-
     return parsedPort;
 }
 

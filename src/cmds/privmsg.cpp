@@ -50,7 +50,7 @@ void Server::handlePrivmsg(int fd, std::string &input, Client &client) {
     std::string trailing;
     std::string response;
     for (size_t i = 0; i < targts.size(); ++i) {
-        trailing = getTrailing(tokens, trailing);
+        trailing = getTrailing(tokens, trailing, input);
         target = targts[i];
         if (isChannel(fd, target, client, trailing))
             continue;

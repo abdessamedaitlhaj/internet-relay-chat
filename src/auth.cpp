@@ -65,12 +65,6 @@ void Server::handleNick(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_NICKNAMEINUSE(tokens[1]));
         return;
     }
-    if (client.isRegistered()) {
-        std::string response = ":" + client.getHostName() + client.getIpAddress() + " NICK " + tokens[1] + CRLF;
-        client.setNickName(tokens[1]);
-        sendResponse(fd, response);
-        return;
-    }
     if (!client.getNickName().empty()) {
         sendResponse(fd, ERR_ALREADYREGISTERED(client.getNickName()));
         return;
@@ -81,6 +75,17 @@ void Server::handleNick(int fd, std::string &input, Client &client) {
         client.setRegistered(true);
         sendResponse(fd, RPL_WELCOME(client.getNickName(), client.getUserName(), client.getHostName(), client.getIpAddress()));
     }
+}
+
+bool isUserNameValid(std::string &name) {
+
+    if (name.empty() || isdigit(name[0]))
+        return false;
+    for (size_t i = 0; i < name.length(); ++i) {
+        if (!std::isalpha(name[i]))
+            return false;
+    }
+    return true;
 }
 
 void Server::handleUser(int fd, std::string &input, Client &client) {
@@ -97,18 +102,14 @@ void Server::handleUser(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));
         return;
     }
+    if (!isUserNameValid(tokens[1]))
+        return;
     if (!client.getUserName().empty()) {
         sendResponse(fd, ERR_ALREADYREGISTERED(client.getNickName()));
         return;
     }
-    std::string last;
-    if (tokens.size() > 5) {
-        last = getMsg(tokens, 4);
-    } else if (tokens.size() == 5) {
-        last = tokens[4];
-    }
-    size_t pos = last.find_first_of(":");
-    std::string realName = pos != std::string::npos ? last.substr(pos + 1) : last;
+    size_t pos = input.find_first_of(":");
+    std::string realName = pos != std::string::npos ? input.substr(pos + 1) : tokens[4];
     if (realName.empty()) {
         sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));
         return;
