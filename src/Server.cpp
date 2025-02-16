@@ -1,12 +1,10 @@
 #include "../include/Server.hpp"
 
 Server::~Server() {
-    close(_socket); // Close the main socket
-    // Close all client sockets
+    close(_socket);
     for (size_t i = 0; i < _pollFds.size(); ++i) {
         close(_pollFds[i].fd);
     }
-    // free channels std::vector<Channel*> _channels;
     for (size_t i = 0; i < _channels.size(); ++i) {
         delete _channels[i];
     }
