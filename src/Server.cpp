@@ -1,11 +1,13 @@
 #include "../include/Server.hpp"
 
-
 Server::~Server() {
     close(_socket); // Close the main socket
     // Close all client sockets
     for (size_t i = 0; i < _pollFds.size(); ++i) {
         close(_pollFds[i].fd);
+    }
+    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        _clients.erase(it);
     }
 }
 
@@ -96,11 +98,10 @@ void Server::breakSignal(int signum)
 {
     if ((signum == SIGINT) || (signum == SIGQUIT))
     {
-        std::cout << std::endl << "Signal Received !!!" << std::endl;
+        std::cout << std::endl << YELLOW << "Signal Received !!!" << RESET << std::endl;
         _break = 1;
     }
 }
-
 
 bool Server::accept_cl()
 {
@@ -118,10 +119,9 @@ bool Server::accept_cl()
     _pollFds.push_back(newPoll);
     _clients[clientFd] = Client(clientFd);
     _clients[clientFd].setIpAddress(inet_ntoa(clientAddr.sin_addr));
-    std::cout << "New client connected: " << clientFd << std::endl;
+    std::cout << GREEN << "Client <" << clientFd << "> Connected: " << RESET << std::endl;
     return true ;
 }
-
 
 void Server::receive(size_t & i)
 {
@@ -132,14 +132,14 @@ void Server::receive(size_t & i)
         return;
 
     if (bytes <= 0) {
-        std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
+        std::cout << RED << "Client <" << _pollFds[i].fd << "> Disconnected" << RESET << std::endl;
         close(_pollFds[i].fd);
         _clients.erase(_pollFds[i].fd);
         _pollFds.erase(_pollFds.begin() + i);
         i--;
     } else {
         buffer[bytes] = '\0';
-        std::cout << "BUFFER : " << buffer << std::endl;
+        std::cout << GREEN << "BUFFER : " << RESET << buffer <<  std::endl;
         std::string buff(buffer);
         handleBuffer(_pollFds[i].fd, buff);
     }
@@ -180,12 +180,11 @@ void Server::handleBuffer(int fd, std::string &buffer) {
     Client *client = getClient(fd);
     std::vector<std::string> commands;
     client->setBuffer(buffer);
-    std::cout << client->getBuffer() << std::endl;
     if(client->getBuffer().find_first_of("\r\n") == std::string::npos)
         return;
     commands = parseData(client);
-    for (size_t i = 0; i < commands.size(); i++)
-        parseCommand(fd, commands[i]);
+    for (std::vector<std::string>::iterator it = commands.begin(); it != commands.end(); ++it)
+        parseCommand(fd, *it);
     client->clearBuffer();
     return;
 }
