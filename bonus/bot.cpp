@@ -165,8 +165,7 @@ void Bot::privatemessage(std::string& UserNick, std::string message) {
     std::string line;
 
     while (std::getline(stream,  line, '\n')) {
-        sendResponse(botsock, priv + line + "\r\n");
-        // std::cout <<"line :"<< priv + line + "\r\n" << std::endl;
+        sendResponse(botsock, priv + line + "\n");
     }
 }
 
@@ -181,8 +180,6 @@ void Bot::play(QuestionGame& game, std::string& UserNick, std::string retrieved)
         tokens.push_back(token);
     }
 
-    // Ensure correct number of tokens
-    std::cout << tokens.size() << std::endl;
     if (tokens.size() != 4)
         return privatemessage(UserNick, response);
 

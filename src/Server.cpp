@@ -123,7 +123,7 @@ bool Server::accept_cl()
 
 void Server::receive(size_t & i)
 {
-    char buffer[1024];
+    char buffer[2048];
     int bytes = recv(_pollFds[i].fd, buffer, sizeof(buffer) - 1, 0);
 
     if (sizeof(buffer) == 0)
