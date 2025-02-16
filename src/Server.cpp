@@ -6,8 +6,9 @@ Server::~Server() {
     for (size_t i = 0; i < _pollFds.size(); ++i) {
         close(_pollFds[i].fd);
     }
-    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        _clients.erase(it);
+    // free channels std::vector<Channel*> _channels;
+    for (size_t i = 0; i < _channels.size(); ++i) {
+        delete _channels[i];
     }
 }
 
