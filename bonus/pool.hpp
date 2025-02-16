@@ -51,7 +51,7 @@
 #define MENU_MESSAGE "BOT MANUAL - MASTER THE GAME COMMANDS\n\n" \
                     "To play the quiz game, use the following commands:\n\n" \
                     "1. START THE GAME:\n" \
-                    "------Use 'privmsg bot start' to begin or get a new question.\n\n" \
+                    "------Use 'privmsg bot_nickname start' to begin or get a new question.\n\n" \
                     "2. ANSWER THE QUESTION:\n" \
                     "------Reply with a single character: 'a', 'b', 'c', or 'd'.\n" \
                     "------Correct answer → Level up!\n" \

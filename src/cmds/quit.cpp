@@ -34,7 +34,11 @@ void Server::handleQuit(int fd, std::string &input, Client& client)
                 _channels[i]->broadcastToAll(response);
             }
             else
+            {
                 _channels.erase(_channels.begin() + i);
+                delete _channels[i];
+                i--;
+            }
         }
     }
     std::cout << RED << "Client <" << fd << "> Disconnected" << RESET << std::endl;

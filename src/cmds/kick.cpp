@@ -79,5 +79,17 @@ void Server::handleKick(int fd, std::string &input, Client& client)
         if (channel->isOperator(new_user))
             channel->removeOperator(new_user);
         channel->removeMember(new_user);
+        if (channel->getclientsnumber() == 0)
+        {
+            for (size_t i = 0; i < _channels.size(); i++)
+            {
+                if (_channels[i] == channel)
+                {
+                    _channels.erase(_channels.begin() + i);
+                    delete channel;
+                    break;
+                }
+            }
+        }
     }
 }
