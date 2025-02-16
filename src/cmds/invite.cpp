@@ -17,26 +17,22 @@ void Server::handleInvite(int fd, std::string &input, Client &client)
         sendResponse(fd, ERR_NOSUCHCHANNEL(client.getNickName(), channel_name));
         return ;
     }
-    // Check if sender is not on the channel
     if (!channel->isMember(&client))
     {
         sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), channel_name));
         return ;
     }
-    // Check if channel is invite only && if sender is not operator
     if (channel->getInviteOnly() && !channel->isOperator(&client))
     {
         sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channel_name));
         return ;
     }
-    //Check if user exists
     Client *new_user = getClientNick(nickname);
     if (!new_user)
     {
         sendResponse(fd, ERR_NOSUCHNICK(client.getNickName(), nickname));
         return ;
     }
-    // Check if user is already on the channel
     if (channel->isMember(new_user))
     {
         sendResponse(fd, ERR_USERONCHANNEL(client.getNickName(), new_user->getNickName(), channel_name));
@@ -47,4 +43,3 @@ void Server::handleInvite(int fd, std::string &input, Client &client)
     std::string response = ":" + client.getHostName() + " INVITE " + new_user->getNickName() + " #" + channel_name + CRLF;
     sendResponse(new_user->getFd(), response);
 }
-//test all the cases

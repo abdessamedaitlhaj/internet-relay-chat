@@ -35,7 +35,6 @@ void Server::handleKick(int fd, std::string &input, Client& client)
     }
     else
         reason = "kicked";
-    // validate channel name
     if (channelname.empty() || channelname[0] != '#' )
     {
         sendResponse(fd, ERR_BADCHANMASK(channelname));
@@ -51,20 +50,17 @@ void Server::handleKick(int fd, std::string &input, Client& client)
             sendResponse(fd, ERR_NOSUCHCHANNEL(client.getNickName(), channel_name));
             return ;
         }
-        //check if sender is not on the channel
         if (!channel->isMember(&client))
         {
             sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), channel_name));
             return ;
         }
         Client *new_user = getClientNick(nickname);
-        //check if user is not on the channel
         if (!new_user || !channel->isMember(new_user))
         {
             sendResponse(fd, ERR_USERNOTINCHANNEL(client.getNickName(), nickname, channel_name));
             return ;
         }
-        //check if sender is operator
         if (!channel->isOperator(&client))
         {
             sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channel_name));

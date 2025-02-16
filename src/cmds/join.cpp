@@ -15,7 +15,6 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
     if (tokens.size() > 2)
         passwords = tokens[2];
     std::string buffer;
-    //split channels
     for (size_t i = 0; i < channels.length(); i++)
     {
         if (channels[i] == ',')
@@ -27,7 +26,6 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
             buffer += channels[i];
     }
     pairs_channels.push_back(std::make_pair(buffer, ""));
-    //split passwords
     if (!passwords.empty()) {
         buffer.clear();
         size_t j = 0;
@@ -93,7 +91,7 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
                 sendResponse(fd, ERR_CHANNELISFULL(client.getNickName(), _channel_name));
                 continue ;
             }
-            channel->addMember(&client);//add member to channel
+            channel->addMember(&client);
         }
         std::string joinreply = RPL_JOINMSG(client.getHostName(), client.getIpAddress(), _channel_name);
         if (!channel->getTopic().empty()) {
