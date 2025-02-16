@@ -121,27 +121,16 @@ Client *Server::getClientNick(std::string &nick) {
     return (NULL);
 }
 
-std::string Server::getTrailing(std::vector<std::string> &tokens, std::string &trailing) {
+std::string Server::getTrailing(std::vector<std::string> &tokens, std::string &trailing, std::string &input) {
 
     std::string last;
     size_t pos;
-    if (tokens.size() > 3)
-        last = tokens[2].find_first_of(":") != std::string::npos ? getMsg(tokens, 2) : tokens[2];
-    else if (tokens.size() == 3)
-        last = tokens[2];
 
-    pos = last.find_first_of(":");
+    pos = input.find_first_of(":");
     if (pos != std::string::npos)
-        trailing = last.substr(pos + 1);
+        trailing = input.substr(pos + 1);
     else
-        trailing = last;
-    return trailing;
-}
+        trailing = tokens[2];
 
-std::string Server::getMsg(std::vector<std::string> &tokens, int start) {
-    std::string msg;
-    for (size_t i = start; i < tokens.size(); ++i) {
-        i == tokens.size() - 1 ? msg += tokens[i] : msg += tokens[i] + " ";
-    }
-    return msg;
+    return trailing;
 }

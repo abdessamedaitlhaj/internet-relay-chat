@@ -43,7 +43,6 @@ int Server::parse_port(std::string port)
     if (parsedPort >= 0 && parsedPort <= 1023) {
         throw std::invalid_argument("Port is a reserved, well-known port.");
     }
-
     return parsedPort;
 }
 
@@ -58,7 +57,7 @@ Server::Server(char** av) {
 
 void Server::serverSocket() 
 {
-    _serverAddress.sin_family = AF_INET; //ipv4
+    _serverAddress.sin_family = AF_INET;
     _serverAddress.sin_port = htons(_port); // network byte order
     _serverAddress.sin_addr.s_addr = INADDR_ANY; // any local machine
     _socket = socket(AF_INET, SOCK_STREAM, 0); // server socket fd

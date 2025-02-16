@@ -26,15 +26,11 @@
 #include <unistd.h>
 #include <netdb.h>
 
-// Define colors
 #define RESET   "\e[0m"
 #define RED     "\e[1;31m"
 #define GREEN   "\e[1;32m"
 #define YELLOW  "\e[1;33m"
-#define BLUE    "\e[1;34m"
 #define MAGENTA "\e[1;35m"
-#define CYAN    "\e[1;36m"
-#define WHITE   "\e[1;37m"
 
 struct ModeChange {
     char mode;
@@ -89,14 +85,13 @@ class Server {
 		void						handleQuit(int fd, std::string &input, Client &client);
 		bool						channelNameValid(std::string &channelName);
 		void 						addChannel(Channel *channel);
-		std::string 				getMsg(std::vector<std::string> &tokens, int start);
 		std::string 				checkModes(int fd, ModeChange &modeChange, Channel &channel, std::map<char, std::string> &params);
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
 		void						removeFd(int fd);
 		std::string					getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
 		std::string					applyModes(int fd, std::vector<ModeChange>& modeChanges, Channel &channel);
-		std::string					getTrailing(std::vector<std::string> &tokens, std::string &trailing);
+		std::string					getTrailing(std::vector<std::string> &tokens, std::string &trailing, std::string &input);
 		bool						isChannel(int fd, std::string &target, Client &client, std::string &trailing);
 		bool						isClient(int fd, std::string &target, Client &client, std::string &trailing);
 
