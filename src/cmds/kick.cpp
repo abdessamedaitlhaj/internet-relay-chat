@@ -19,17 +19,9 @@ void Server::handleKick(int fd, std::string &input, Client& client)
     std::string reason;
     if (tokens.size() > 3)
     {
-        if (tokens[3][0] == ':')
-        {
-            tokens[3] = tokens[3].substr(1);
-            reason = "";
-            for (size_t i = 3; i < tokens.size(); i++)
-            {
-                reason += tokens[i];
-                if (i < tokens.size() - 1)
-                    reason += " ";
-            }
-        }
+        size_t pos = input.find_first_of(":");
+        if (pos != std::string::npos)
+            reason += input.substr(pos + 1);
         else
             reason = tokens[3];
     }

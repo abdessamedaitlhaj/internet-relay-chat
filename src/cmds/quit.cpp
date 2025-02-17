@@ -7,16 +7,11 @@ void Server::handleQuit(int fd, std::string &input, Client& client)
     std::string reason = "Quit";
     if (tokens.size() > 1)
     {
-        if (tokens[1][0] == ':')
+        size_t pos = input.find_first_of(":");
+        if (pos != std::string::npos)
         {
-            tokens[1] = tokens[1].substr(1);
             reason = "Quit: ";
-            for (size_t i = 1; i < tokens.size(); i++)
-            {
-                reason += tokens[i];
-                if (i < tokens.size() - 1)
-                    reason += " ";
-            }
+            reason += input.substr(pos + 1);
         }
         else
             reason = tokens[1];

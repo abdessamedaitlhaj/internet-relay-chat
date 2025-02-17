@@ -74,7 +74,6 @@ void sendResponse(int fd, const std::string& response) {
 void handle(int signum){
 	(void)signum;
 	std::cout << std::endl << "Signal received !!" << std::endl;
-    // maybe send quit to the server if they handled it 
     sendResponse(botsock, "QUIT " "\r\n");
 }
 
@@ -83,7 +82,6 @@ void Bot::setup()
 {
     signal(SIGINT, handle);
 	signal(SIGQUIT, handle);
-    
 
     struct sockaddr_in ircServerAddr;
 	botsock = socket(AF_INET, SOCK_STREAM, 0);
@@ -117,7 +115,7 @@ std::string Bot::extractNickname(std::string& message) {
     size_t end = message.find("!");
 
     if (start == std::string::npos || end == std::string::npos || start >= end)
-        return ""; // Return empty string if parsing fails
+        return ""; 
 
     return message.substr(start + 1, end - start - 1);
 }
@@ -142,7 +140,6 @@ void Bot::game() {
 			    _log = true;
 		    else if (!_log){
 			    std::cout << retrieved << std::endl;
-		    	std::cout << _log << std::endl;
 			    return;
 		    }
 		    else if(retrieved.find("PRIVMSG") != std::string::npos && _log)

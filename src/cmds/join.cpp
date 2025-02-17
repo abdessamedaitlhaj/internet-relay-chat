@@ -57,7 +57,6 @@ void Server::handleJoin(int fd, std::string &input, Client& client)
         if (!channel)
         {
             Channel *new_channel = new Channel(_channel_name);
-            new_channel->setname(_channel_name);
             new_channel->addOperator(&client);
             _channels.push_back(new_channel);
             new_channel->addMember(&client);

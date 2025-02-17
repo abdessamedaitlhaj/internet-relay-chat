@@ -26,7 +26,7 @@
 #define ERR_BADCHANMASK(channelName) ": 476 " + channelName + " :Bad Channel Mask" + CRLF
 #define ERR_USERNOTINCHANNEL(nickName, new_user, channelName) ": 441 " + nickName + " " + new_user + " #" + channelName + " :They aren't on that channel" + CRLF
 #define ERR_UNKNOWNMODE(nickName, mode) ": 472 " + nickName + " " + mode + " :is unknown mode char to me" + CRLF
-#define ERR_USERONCHANNEL(nickName, new_user, channelName) ": 443 " + nickName + " " + new_user + channelName + " :is already on channel" + CRLF
+#define ERR_USERONCHANNEL(nickName, new_user, channelName) ": 443 " + nickName + " " + new_user + " " + channelName + " :is already on channel" + CRLF
 
 
 #define RPL_WELCOME(nickName, userName, hostName, ip) ": 001 " + nickName + " :Welcome to the Internet Relay Network " + hostName + ip + CRLF
