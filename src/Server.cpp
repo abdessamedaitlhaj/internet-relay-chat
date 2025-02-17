@@ -146,13 +146,16 @@ void Server::removeChannel(Client &client)
 
 bool Server::accept_cl()
 {
+    int check;
     struct sockaddr_in clientAddr;
     socklen_t clientLen = sizeof(clientAddr);
     int clientFd = accept(_socket, (struct sockaddr*)&clientAddr, &clientLen);
     // or continue check later
     if (clientFd < 0) return false ;
 
-    fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    check = fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    if (check == -1)
+        throw(std::runtime_error("setting option(O_NONBLOCK) failed"));
     struct pollfd newPoll;
     newPoll.fd = clientFd;
     newPoll.events = POLLIN;
@@ -195,10 +198,10 @@ void Server::setup() {
     this->serverSocket();
     while (!_break) {
         int poll_result = poll(&_pollFds[0], _pollFds.size(), -1);
-        if (poll_result == -1) {
-            if (errno != EINTR) {
-                throw std::runtime_error("poll() failed");
-            }
+        if (poll_result == -1 && !_break) {
+        {
+            throw std::runtime_error("poll() failed");
+        }
             continue;
         }
 
