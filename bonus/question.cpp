@@ -119,7 +119,7 @@ QuestionGame::Question &QuestionGame::getRandomQuestion(int level) {
     srand(time(0));
     int index = rand() % levels[level - 1].size();
     return levels[level - 1][index];
-}
+} 
 
 std::string QuestionGame::gameMessage(int flag)
 {

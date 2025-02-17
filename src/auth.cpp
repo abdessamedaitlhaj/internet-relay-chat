@@ -102,8 +102,10 @@ void Server::handleUser(int fd, std::string &input, Client &client) {
         sendResponse(fd, ERR_NEEDMOREPARAMS(client.getNickName(), tokens[0]));
         return;
     }
-    if (!isUserNameValid(tokens[1]))
+    if (!isUserNameValid(tokens[1])) {
+        sendResponse(fd, ERR_ERRONEUSUSERNAME(tokens[1]));
         return;
+    }
     if (!client.getUserName().empty()) {
         sendResponse(fd, ERR_ALREADYREGISTERED(client.getNickName()));
         return;

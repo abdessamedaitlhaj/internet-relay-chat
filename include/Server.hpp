@@ -3,7 +3,6 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "numericReplies.hpp"
-#include "../bonus/question.hpp"
 
 #include <string>
 #include <poll.h>
@@ -41,7 +40,7 @@ struct ModeChange {
 class Client;
 
 class Server {
-
+ 
 	private:
 		int _port;
 		int _socket;

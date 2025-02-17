@@ -12,7 +12,7 @@ void Server::handleInvite(int fd, std::string &input, Client &client)
     std::string nickname = tokens[1];
     std::string channel_name = tokens[2].substr(1);
     Channel *channel = getChannel(channel_name);
-    if (!channel)
+    if (!channel) 
     {
         sendResponse(fd, ERR_NOSUCHCHANNEL(client.getNickName(), channel_name));
         return ;

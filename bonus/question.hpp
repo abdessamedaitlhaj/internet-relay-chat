@@ -33,5 +33,4 @@ class QuestionGame {
     	void setQuestionSent(bool flag) { questionSent = flag; }
     	void setAnswer(char answer) { correctAnswer = answer; }
     	void addLevel() { level++; }
-
 };

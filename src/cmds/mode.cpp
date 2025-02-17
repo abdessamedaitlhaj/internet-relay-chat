@@ -214,6 +214,10 @@ void Server::handleMode(int fd, std::string &input, Client &client) {
         sendResponse(fd, RPL_CREATIONTIME(client.getNickName(), channelName, std::to_string(time(NULL))));
         return ;
     }
+    if (!channel->isMember(&client)) {
+        sendResponse(fd, ERR_NOTONCHANNEL(client.getNickName(), channelName));
+        return;
+    }
     if (!channel->isOperator(&client)) {
         sendResponse(fd, ERR_CHANOPRIVSNEEDED(client.getNickName(), channelName));
         return;

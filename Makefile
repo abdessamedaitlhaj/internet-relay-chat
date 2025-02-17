@@ -25,7 +25,6 @@ $(NAME_BONUS): $(OBJ_BONUS)
 $(OBJ_BONUS): %.o: %.cpp $(BOT_HEADER)
 	c++ $(CPPFLAGS) -c $< -o $@ 
 
-
 clean:
 	rm -f $(OBJ) $(OBJ_BONUS)
 
