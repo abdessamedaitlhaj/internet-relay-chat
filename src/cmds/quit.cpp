@@ -10,7 +10,7 @@ void Server::handleQuit(int fd, std::string &input, Client& client)
         if (tokens[1][0] == ':')
         {
             tokens[1] = tokens[1].substr(1);
-            reason = "";
+            reason = "Quit: ";
             for (size_t i = 1; i < tokens.size(); i++)
             {
                 reason += tokens[i];
@@ -30,7 +30,7 @@ void Server::handleQuit(int fd, std::string &input, Client& client)
             _channels[i]->removeMember(&client);
             if (_channels[i]->getclientsnumber() != 0)
             {
-                std::string response = ":" + client.getHostName() + " QUIT " + ":" + reason + CRLF;
+                std::string response = ":" + client.getHostName() + client.getIpAddress() +  " QUIT " + ":" + reason + CRLF;
                 _channels[i]->broadcastToAll(response);
             }
             else
@@ -42,6 +42,7 @@ void Server::handleQuit(int fd, std::string &input, Client& client)
         }
     }
     std::cout << RED << "Client <" << fd << "> Disconnected" << RESET << std::endl;
+    removeClient(fd);
     removeFd(fd);
     close(fd);
 }

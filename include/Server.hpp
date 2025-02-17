@@ -89,6 +89,8 @@ class Server {
 		Client						*getClientNick(std::string &nick);
 		Client						*getClientUserName(std::string &nick);
 		void						removeFd(int fd);
+		void						removeChannel(Client &client);
+		void						removeClient(int fd);
 		std::string					getAppliedModes(std::vector<ModeChange>& modeChanges, Channel &channel);
 		std::string					applyModes(int fd, std::vector<ModeChange>& modeChanges, Channel &channel);
 		std::string					getTrailing(std::vector<std::string> &tokens, std::string &trailing, std::string &input);

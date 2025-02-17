@@ -100,6 +100,49 @@ void Server::breakSignal(int signum)
         _break = 1;
     }
 }
+void Server::removeFd(int fd)
+{
+    for (size_t i = 0; i < _pollFds.size(); i++)
+    {
+        if (_pollFds[i].fd == fd)
+        {
+            _pollFds.erase(_pollFds.begin() + i);
+            break;
+        }
+    }
+}
+
+void Server::removeClient(int fd)
+{
+    std::map<int, Client>::iterator it = _clients.find(fd);
+    if (it != _clients.end()) {
+        _clients.erase(it);
+    }
+}
+
+void Server::removeChannel(Client &client)
+{
+    for (size_t i = 0; i < _channels.size(); i++)
+    {
+        if (_channels[i]->getclient(client.getNickName()))
+        {
+            if (_channels[i]->isOperator(&client))
+                _channels[i]->removeOperator(&client);
+            _channels[i]->removeMember(&client);
+            if (_channels[i]->getclientsnumber() != 0)
+            {
+                std::string response = ":" + client.getHostName() + client.getIpAddress() + " QUIT " + ":" + "Quit" + CRLF;
+                _channels[i]->broadcastToAll(response);
+            }
+            else
+            {
+                _channels.erase(_channels.begin() + i);
+                delete _channels[i];
+                i--;
+            }
+        }
+    }
+}
 
 bool Server::accept_cl()
 {
@@ -131,8 +174,9 @@ void Server::receive(size_t & i)
 
     if (bytes <= 0) {
         std::cout << RED << "Client <" << _pollFds[i].fd << "> Disconnected" << RESET << std::endl;
+        removeChannel(_clients[_pollFds[i].fd]);
+        removeClient(_pollFds[i].fd);
         close(_pollFds[i].fd);
-        _clients.erase(_pollFds[i].fd);
         _pollFds.erase(_pollFds.begin() + i);
         i--;
     } else {
@@ -185,16 +229,4 @@ void Server::handleBuffer(int fd, std::string &buffer) {
         parseCommand(fd, *it);
     client->clearBuffer();
     return;
-}
-
-void Server::removeFd(int fd)
-{
-    for (size_t i = 0; i < _pollFds.size(); i++)
-    {
-        if (_pollFds[i].fd == fd)
-        {
-            _pollFds.erase(_pollFds.begin() + i);
-            break;
-        }
-    }
 }
