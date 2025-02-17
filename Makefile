@@ -5,9 +5,12 @@ HEADER = include/Server.hpp include/Client.hpp include/Channel.hpp include/numer
 NAME = ircserv
 NAME_BONUS = bot
 
-BOT = bonus/bot.cpp bonus/question.cpp bonus/main.cpp
-BOT_HEADER = bonus/bot.hpp bonus/question.hpp bonus/pool.hpp
-OBJ_BONUS = $(BOT:.cpp=.o)
+BOT = bonus/bot.cpp  bonus/main.cpp
+QUESTION =  bonus/question.cpp 
+BOT_HEADER = bonus/bot.hpp bonus/pool.hpp bonus/question.hpp
+POOL_HEADER = bonus/pool.hpp bonus/question.hpp
+BOT_BONUS = $(BOT:.cpp=.o)
+QUESTION_BONUS = $(QUESTION:.cpp=.o)
 
 
 all: $(NAME)
@@ -19,17 +22,20 @@ $(NAME): $(OBJ)
 %.o: %.cpp $(HEADER)
 	c++ $(CPPFLAGS) -c $< -o $@ 
 
-$(NAME_BONUS): $(OBJ_BONUS)
-	c++ $(CPPFLAGS) $(OBJ_BONUS)  -o $(NAME_BONUS) 
+$(NAME_BONUS): $(BOT_BONUS) $(QUESTION_BONUS)
+	c++ $(CPPFLAGS) $(BOT_BONUS) $(QUESTION_BONUS)  -o $(NAME_BONUS) 
 
-$(OBJ_BONUS): %.o: %.cpp $(BOT_HEADER)
+$(BOT_BONUS): %.o: %.cpp $(BOT_HEADER)
+	c++ $(CPPFLAGS) -c $< -o $@ 
+
+$(QUESTION_BONUS): %.o: %.cpp $(POOL_HEADER)
 	c++ $(CPPFLAGS) -c $< -o $@ 
 
 clean:
-	rm -f $(OBJ) $(OBJ_BONUS)
+	rm -f $(OBJ) $(QUESTION_BONUS)  $(BOT_BONUS)
 
 fclean: clean
-	rm -f $(NAME) $(NAME_BONUS)
+	rm -f $(NAME) $(NAME_BONUS) $(QUESTION_BONUS)  $(BOT_BONUS)
 
 re: fclean all
 
