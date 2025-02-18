@@ -57,9 +57,9 @@ Server::Server(char** av) {
 
 void Server::serverSocket() 
 {
-    _serverAddress.sin_family = AF_INET;
+    _serverAddress.sin_family = AF_INET;   // IPv4
     _serverAddress.sin_port = htons(_port); // network byte order
-    _serverAddress.sin_addr.s_addr = INADDR_ANY; // any local machine
+    _serverAddress.sin_addr.s_addr = INADDR_ANY; // any interface
     _socket = socket(AF_INET, SOCK_STREAM, 0); // server socket fd
     if(_socket == -1)
 		throw(std::runtime_error("socket creation failed"));
@@ -70,7 +70,7 @@ void Server::serverSocket()
     if (check == -1)
 		throw(std::runtime_error("setting option SO_REUSEADDR failed"));
 
-    check = fcntl(_socket, F_SETFL, O_NONBLOCK);
+    check = fcntl(_socket, F_SETFL, O_NONBLOCK); // set the file status flag to non-blocking
     if (check == -1)
         throw(std::runtime_error("setting option(O_NONBLOCK) failed"));
     check = bind(_socket, (struct sockaddr *)&_serverAddress, sizeof(_serverAddress)); //bind the socket to the address
@@ -162,7 +162,7 @@ bool Server::accept_cl()
     newPoll.revents = 0;
     _pollFds.push_back(newPoll);
     _clients[clientFd] = Client(clientFd);
-    _clients[clientFd].setIpAddress(inet_ntoa(clientAddr.sin_addr));
+    _clients[clientFd].setIpAddress(inet_ntoa(clientAddr.sin_addr)); // convert IP address to string
     std::cout << GREEN << "Client <" << clientFd << "> Connected: " << RESET << std::endl;
     return true ;
 }
