@@ -147,3 +147,40 @@ std::string QuestionGame::gameMessage(int flag)
 	return (END_MESSAGE);
 }
 
+
+int QuestionGame::getLevel() const {
+    return level;
+}
+
+bool QuestionGame::getStarted() const {
+    return started;
+}
+
+bool QuestionGame::isQuestionSent() const {
+    return questionSent;
+}
+
+char QuestionGame::getAnswer() const {
+    return correctAnswer;
+}
+
+void QuestionGame::setLevel(int newLevel) {
+    level = newLevel;
+}
+
+void QuestionGame::setStarted(bool startedFlag) {
+    started = startedFlag;
+}
+
+void QuestionGame::setQuestionSent(bool flag) {
+    questionSent = flag;
+}
+
+void QuestionGame::setAnswer(char answer) {
+    correctAnswer = answer;
+}
+
+void QuestionGame::addLevel() {
+    level++;
+}
+

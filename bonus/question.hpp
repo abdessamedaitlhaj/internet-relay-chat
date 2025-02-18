@@ -23,14 +23,14 @@ class QuestionGame {
 		QuestionGame();
 		Question & getRandomQuestion(int level);
 		std::string  gameMessage(int flag);
-		int getLevel() const { return level; }
-    	bool getStarted() const { return started; }
-    	bool isQuestionSent() const { return questionSent; }
-    	char getAnswer() const { return correctAnswer; }
+		int getLevel() const ;
+    	bool getStarted() const ;
+    	bool isQuestionSent() const ;
+    	char getAnswer() const ;
 
-    	void setLevel(int newLevel) { level = newLevel; }
-    	void setStarted(bool startedFlag) { started = startedFlag; }
-    	void setQuestionSent(bool flag) { questionSent = flag; }
-    	void setAnswer(char answer) { correctAnswer = answer; }
-    	void addLevel() { level++; }
+    	void setLevel(int newLevel);
+    	void setStarted(bool startedFlag) ;
+    	void setQuestionSent(bool flag) ;
+    	void setAnswer(char answer) ;
+    	void addLevel() ;
 };
