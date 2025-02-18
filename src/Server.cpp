@@ -76,15 +76,10 @@ void Server::serverSocket()
     check = bind(_socket, (struct sockaddr *)&_serverAddress, sizeof(_serverAddress)); //bind the socket to the address
     if (check == -1)
         throw(std::runtime_error("binding socket failed"));
-    struct sockaddr_in addr;
-    socklen_t addr_len = sizeof(addr);
-    getsockname(_socket, (struct sockaddr*)&addr, &addr_len);
-    char *serverIP = inet_ntoa(addr.sin_addr);
     check = listen(_socket, SOMAXCONN); // listen for  connections && the socket a passive socket
     if (check == -1)
         throw(std::runtime_error("listen() failed"));
 
-    _serverName = serverIP;
     _poll.fd = _socket;
     _poll.events = POLLIN; // for reading
     _poll.revents = 0;
