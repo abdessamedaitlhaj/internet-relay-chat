@@ -51,7 +51,6 @@ class Server {
 		std::map<int, Client> _clients;
 		std::vector<struct pollfd> _pollFds;
 		std::vector<Channel*> _channels;
-		std::string _serverName;
 
 	public:
 		Server(char** av);
