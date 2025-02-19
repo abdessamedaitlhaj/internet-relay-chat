@@ -21,7 +21,7 @@
 #define WHITE   "\e[1;37m"
 
 #define LOCALHOST "127.0.0.1"
-#define USERNAME "bot 0 * botty"
+#define USERNAME "bot 0 * name"
 
 
 

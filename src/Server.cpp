@@ -7,6 +7,7 @@ Server::~Server() {
     }
     for (size_t i = 0; i < _channels.size(); ++i) {
         delete _channels[i];
+        _channels.erase(_channels.begin() + i);
     }
 }
 
@@ -136,8 +137,8 @@ void Server::removeChannel(Client &client)
             }
             else
             {
-                _channels.erase(_channels.begin() + i);
                 delete _channels[i];
+                _channels.erase(_channels.begin() + i);
                 i--;
             }
         }
@@ -172,6 +173,8 @@ void Server::receive(size_t & i)
     char buffer[2048];
     int bytes = recv(_pollFds[i].fd, buffer, sizeof(buffer) - 1, 0);
 
+    if (sizeof(buffer) == 0)
+        return;
 
     if (bytes <= 0) {
         std::cout << RED << "Client <" << _pollFds[i].fd << "> Disconnected" << RESET << std::endl;

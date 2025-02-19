@@ -95,6 +95,10 @@ Use an IRC client (e.g., HexChat, irssi, WeeChat) to connect:
 ## Running the Bot
 
 To run the quiz bot, execute:
+Compile the bot:
+```sh
+make bonus
+```
 ```sh
 ./bot <port> <password> <bot_nickname>
 ```
